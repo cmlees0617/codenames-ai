@@ -44,7 +44,7 @@ def generate_vocab(zipf_cutoff: float) -> list[str]:
 def main():
     # 1. Resolve paths: Get the directory of this script (src/), then find data/
     SCRIPT_DIR = Path(__file__).parent
-    DATA_DIR = SCRIPT_DIR.parent / "data"
+    DATA_DIR = SCRIPT_DIR.parent.parent / "data"
     
     # Ensure the data directory exists before trying to write to it
     DATA_DIR.mkdir(parents=True, exist_ok=True)

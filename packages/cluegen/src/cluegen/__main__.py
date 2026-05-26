@@ -21,9 +21,9 @@ def main() -> None:
     boards = load_boards_from_json(data_dir / "test_boards.json")
     board = boards[0]
 
-    targets = board["reds"]
+    targets = board["blues"]
     civilians = board["civilians"]
-    enemies = board["blues"]
+    enemies = board["reds"]
     assassins = board["assassins"]
 
     spymaster.initialize_game_board(targets + civilians + enemies + assassins)

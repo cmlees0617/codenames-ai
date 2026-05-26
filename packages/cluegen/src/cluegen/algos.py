@@ -15,6 +15,7 @@ class CodenamesSpymaster:
         Download selected model and initialize state variables.
         """
         print(f"Loading embedding model '{model_name}'...")
+        self.model_name = model_name
         self.model = SentenceTransformer(model_name)
 
         # The global vocabulary the AI is allowed to use for clues
@@ -42,8 +43,13 @@ class CodenamesSpymaster:
         Reads a vocabulary file. If a pre-computed pickle file exists, loads that.
         Otherwise, computes the embeddings and saves them to a pickle file for next time.
         """
-        # Create a cache path (e.g., data/simple_vocab.txt -> data/simple_vocab.pkl)
-        cache_path = filepath.replace('.txt', '.pkl')
+        # Sanitize the model name
+        safe_model_name = self.model_name.replace("/", "-").replace("\\", "-")
+
+        # Create a model-specific cache path
+        original_path = Path(filepath)
+        cache_filename = f"{original_path.stem}_{safe_model_name}.pkl"
+        cache_path = original_path.parent / cache_filename
         
         # Try to load from cache
         if Path(cache_path).exists():
@@ -54,8 +60,8 @@ class CodenamesSpymaster:
             print(f"Loaded {len(self.vocabulary)} words from cache.")
             return
 
-        # Fallback: Compute embeddings if no cache exists
-        with open(filepath, 'r') as file:
+        # Compute embeddings if no cache exists
+        with open(filepath, 'r', encoding='utf-8') as file:
             vocab_list = [line.strip().lower() for line in file if line.strip()]
             for i, word in enumerate(vocab_list):
                 if verbose:
@@ -185,10 +191,8 @@ class CodenamesSpymaster:
             raise ValueError("Cannot search for groups of size < 1.")
         if min_targets > max_search_size:
             raise ValueError("min_targets cannot be greater than max_targets.")
-
-        # --- PRECOMPUTATION PHASE ---
         
-        # 1. Filter out illegal substring clues upfront to build our active candidate matrix
+        # Filter out illegal substring clues upfront to build our active candidate matrix
         legal_words = []
         legal_vectors = []
         for word, vec in self.vocabulary.items():
@@ -201,7 +205,7 @@ class CodenamesSpymaster:
             
         legal_matrix = np.array(legal_vectors)
         
-        # 2. Calculate Negative Penalties ONCE for all legal words
+        # Calculate Negative Penalties ONCE for all legal words
         def get_max_sims(board_key):
             vectors = self.board_state[board_key]
             if not vectors:
@@ -217,9 +221,8 @@ class CodenamesSpymaster:
         # Pre-computed array of penalties for every candidate word
         penalty_array = (alpha * max_civ) + (beta * max_enemy) + (gamma * max_assassin)
         target_matrix_full = np.array(self.board_state["targets"])
-
-        # --- COMBINATION SEARCH PHASE ---
         
+        # Search through combinations of targets and compute scores
         target_indices = range(len(self.target_strings))
         for group_size in range(min_targets, max_search_size + 1):
             
