@@ -28,17 +28,18 @@ def build_sync_payload(
     match_id: str,
     player_id: str | None,
     credentials: str,
-    room_id: str,
+    room_id: str | None,
     nickname: str,
     player_locale: str = "en",
 ) -> tuple[Any, ...]:
-    player_meta = {
+    player_meta: dict[str, Any] = {
         "playerName": nickname,
         "playerImage": None,
         "playerLocale": player_locale,
-        "roomID": room_id,
         "credentials": credentials,
     }
+    if room_id:
+        player_meta["roomID"] = room_id
     return (match_id, player_id, credentials, player_meta)
 
 

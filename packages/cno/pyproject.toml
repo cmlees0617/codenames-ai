@@ -3,7 +3,7 @@ name = "cno"
 version = "0.1.0"
 description = "CLI and high-level bot client for codenames.game spymasters"
 requires-python = ">=3.11"
-dependencies = ["cno-sdk"]
+dependencies = ["cno-sdk", "questionary>=2.0.0"]
 
 [project.scripts]
 cno = "cno.cli:main"

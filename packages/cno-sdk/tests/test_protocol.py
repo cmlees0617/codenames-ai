@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from cno_sdk.moves import build_give_clue, build_join_team
+from cno_sdk.moves import build_give_clue, build_join_team, build_leave_team
 from cno_sdk.protocol import build_make_move
 from cno_sdk.state import GameState, is_spymaster_turn, pick_friendly_words
 
@@ -25,6 +25,16 @@ def test_join_team_action_matches_fixture():
         credentials="rosilitu-hasumotu-luhoniba",
     )
     assert action == expected
+
+
+def test_leave_team_action_shape():
+    action = build_leave_team(
+        player_id="2",
+        credentials="rosilitu-hasumotu-luhoniba",
+    )
+    assert action["type"] == "MAKE_MOVE"
+    assert action["payload"]["type"] == "leaveTeam"
+    assert action["payload"]["args"] == []
 
 
 def test_give_clue_action_matches_fixture():

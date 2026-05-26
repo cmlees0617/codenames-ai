@@ -44,8 +44,10 @@ def apply_json_patches(state: dict[str, Any], patches: list[dict[str, Any]]) -> 
         elif op == "remove":
             parent, key = _resolve_parent(updated, parts)
             if isinstance(parent, list):
-                del parent[int(key)]
-            else:
+                index = int(key)
+                if 0 <= index < len(parent):
+                    del parent[index]
+            elif key in parent:
                 del parent[key]
         else:
             raise ValueError(f"Unsupported JSON patch op: {op}")

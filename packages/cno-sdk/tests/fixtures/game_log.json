@@ -1,0 +1,52 @@
+[
+  {
+    "action": {
+      "type": "MAKE_MOVE",
+      "payload": {
+        "type": "giveClue",
+        "args": [
+          {"word": "PINEAPPLE", "number": "3"},
+          {"name": "SpymasterBot", "image": null},
+          ["HEAVEN", "BULB", "CHICK"]
+        ],
+        "playerID": "0"
+      }
+    }
+  },
+  {
+    "action": {
+      "type": "MAKE_MOVE",
+      "payload": {
+        "type": "guessCard",
+        "args": [
+          "HEAVEN",
+          {
+            "playerID": "1",
+            "playerName": "Operative",
+            "playerTeam": "red",
+            "cardColor": "red"
+          }
+        ],
+        "playerID": "1"
+      }
+    }
+  },
+  {
+    "action": {
+      "type": "MAKE_MOVE",
+      "payload": {
+        "type": "guessCard",
+        "args": [
+          "MOUNT",
+          {
+            "playerID": "1",
+            "playerName": "Operative",
+            "playerTeam": "red",
+            "cardColor": "neutral"
+          }
+        ],
+        "playerID": "1"
+      }
+    }
+  }
+]

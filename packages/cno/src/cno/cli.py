@@ -1,77 +1,130 @@
-"""CLI entry point for codenames.game spymaster bot."""
+"""CLI entry point for codenames.game bots."""
 
 from __future__ import annotations
 
 import argparse
 import asyncio
 import logging
-import sys
 
-from cno.session import SpymasterSession
-from cno_sdk.state import Role, TeamColor
-
-ROLE_CHOICES = {
-    "red-spymaster": ("red", "spymasters"),
-    "blue-spymaster": ("blue", "spymasters"),
-    "red-operative": ("red", "operatives"),
-    "blue-operative": ("blue", "operatives"),
-}
+from cno.interactive import prompt_interactive
+from cno.roles import default_nickname, parse_role
+from cno.session import OperativeSession, SpymasterSession
+from cno.shutdown import ShutdownController
 
 
-def parse_role(role: str) -> tuple[TeamColor, Role]:
-    key = role.lower().replace("_", "-")
-    if key not in ROLE_CHOICES:
-        valid = ", ".join(sorted(ROLE_CHOICES))
-        raise argparse.ArgumentTypeError(
-            f"Invalid role {role!r}. Expected one of: {valid}"
-        )
-    return ROLE_CHOICES[key]
+def parse_role_arg(role: str):
+    try:
+        return parse_role(role)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cno",
-        description="Join a codenames.game room as spymaster and give a test clue.",
+        description="Join a codenames.game room as a spymaster or operative bot.",
     )
-    parser.add_argument("room", help="Room slug from the URL, e.g. halok-jonah")
+    parser.add_argument(
+        "room",
+        nargs="?",
+        help="Room slug from the URL, e.g. halok-jonah",
+    )
     parser.add_argument(
         "role",
-        type=parse_role,
-        help="Team role, e.g. red-spymaster or blue-spymaster",
+        nargs="?",
+        type=parse_role_arg,
+        help="Team role, e.g. red-spymaster, blue-operative",
     )
     parser.add_argument(
         "--nickname",
-        default="SpymasterBot",
-        help="Display name in the room (default: SpymasterBot)",
-    )
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        action="store_true",
-        help="Enable debug logging",
+        default=None,
+        help="Display name in the room (defaults to role-based name)",
     )
     return parser
 
 
-async def _async_main(args: argparse.Namespace) -> int:
+def _build_session(args: argparse.Namespace, shutdown: asyncio.Event):
     team, role = args.role
-    if role != "spymasters":
-        logging.error("v1 only supports spymaster roles")
+    nickname = args.nickname or default_nickname(team, role)
+
+    if role == "spymasters":
+        return SpymasterSession(
+            team=team,
+            room=args.room,
+            nickname=nickname,
+            shutdown=shutdown,
+        )
+    if role == "operatives":
+        return OperativeSession(
+            team=team,
+            room=args.room,
+            nickname=nickname,
+            shutdown=shutdown,
+        )
+    raise ValueError(f"Unsupported role {role}")
+
+
+def _validate_args(args: argparse.Namespace) -> str | None:
+    if not args.room:
+        return "Provide a room slug from the URL, e.g. halok-jonah"
+    return None
+
+
+def _normalize_args(args: argparse.Namespace) -> None:
+    if args.role is not None:
+        return
+    if not args.room:
+        return
+    args.role = parse_role(args.room)
+    args.room = None
+
+
+async def _async_main(args: argparse.Namespace) -> int:
+    _normalize_args(args)
+    error = _validate_args(args)
+    if error:
+        logging.error(error)
         return 1
 
-    session = SpymasterSession(room=args.room, team=team, nickname=args.nickname)
+    shutdown = ShutdownController()
     try:
-        await session.run()
+        session = _build_session(args, shutdown.event)
+    except ValueError as exc:
+        logging.error("%s", exc)
+        return 1
+
+    run_task = asyncio.create_task(session.run())
+    shutdown.install(
+        asyncio.get_running_loop(),
+        session.close,
+        run_task=run_task,
+    )
+
+    try:
+        await run_task
         return 0
+    except asyncio.CancelledError:
+        logging.info("Interrupted.")
+        return 130
     finally:
-        await session.close()
+        await shutdown.close(session.close)
 
 
 def main(argv: list[str] | None = None) -> None:
     parser = build_parser()
-    args = parser.parse_args(argv)
+    if argv is None:
+        import sys
+
+        argv = sys.argv[1:]
+
+    if not argv:
+        args = prompt_interactive()
+    else:
+        args = parser.parse_args(argv)
+        _normalize_args(args)
+
     logging.basicConfig(
-        level=logging.DEBUG if args.verbose else logging.INFO,
+        level=logging.DEBUG,
         format="%(levelname)s %(message)s",
     )
     raise SystemExit(asyncio.run(_async_main(args)))
