@@ -1,0 +1,18 @@
+{
+  "description": "MAKE_MOVE joinTeam action shape emitted on socket update event",
+  "event": "update",
+  "payload": [
+    {
+      "type": "MAKE_MOVE",
+      "payload": {
+        "type": "joinTeam",
+        "args": ["red", "spymasters"],
+        "playerID": "0",
+        "credentials": "rosilitu-hasumotu-luhoniba"
+      }
+    },
+    1,
+    "halok-jonah",
+    "0"
+  ]
+}
