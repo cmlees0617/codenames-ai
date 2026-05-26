@@ -1,0 +1,33 @@
+{
+  "description": "Game state after cards dealt, red spymaster turn",
+  "event": "sync",
+  "metadata": {
+    "serverURL": "https://server-discord.gke.codenames.game/2"
+  },
+  "state": {
+    "_stateID": 4,
+    "G": {
+      "grid": [
+        {"index": 0, "word": "RULER", "color": "blue", "revealed": false, "selected": false, "tips": {}},
+        {"index": 1, "word": "PYRAMID", "color": "red", "revealed": false, "selected": false, "tips": {}},
+        {"index": 2, "word": "HEAVEN", "color": "red", "revealed": false, "selected": false, "tips": {}},
+        {"index": 3, "word": "BULB", "color": "red", "revealed": false, "selected": false, "tips": {}},
+        {"index": 4, "word": "CHICK", "color": "red", "revealed": false, "selected": false, "tips": {}},
+        {"index": 5, "word": "CROSS", "color": "black", "revealed": false, "selected": false, "tips": {}}
+      ],
+      "activeTeam": "red",
+      "activeRole": "spymasters",
+      "cardsDealed": true,
+      "gameover": null,
+      "guessLimit": null,
+      "teams": {
+        "red": {"operatives": {"p#1": true}, "spymasters": {"p#0": true}},
+        "blue": {"operatives": {}, "spymasters": {}}
+      }
+    },
+    "ctx": {
+      "currentPlayer": "0",
+      "phase": "game"
+    }
+  }
+}

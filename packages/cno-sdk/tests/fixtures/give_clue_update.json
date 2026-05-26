@@ -1,0 +1,22 @@
+{
+  "description": "MAKE_MOVE giveClue action shape; selectedWords is the 3rd arg in move args",
+  "event": "update",
+  "payload": [
+    {
+      "type": "MAKE_MOVE",
+      "payload": {
+        "type": "giveClue",
+        "args": [
+          {"word": "PINEAPPLE", "number": "3"},
+          {"name": "SpymasterBot", "image": null},
+          ["HEAVEN", "BULB", "CHICK"]
+        ],
+        "playerID": "0",
+        "credentials": "rosilitu-hasumotu-luhoniba"
+      }
+    },
+    5,
+    "halok-jonah",
+    "0"
+  ]
+}

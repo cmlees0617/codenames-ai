@@ -1,0 +1,26 @@
+{
+  "description": "Representative sync response metadata from codenames.game boardgame.io transport",
+  "event": "sync",
+  "metadata": {
+    "serverURL": "https://server-discord.gke.codenames.game/2"
+  },
+  "state": {
+    "_stateID": 0,
+    "G": {
+      "grid": [],
+      "activeTeam": "red",
+      "activeRole": "spymasters",
+      "cardsDealed": false,
+      "gameover": null,
+      "guessLimit": null,
+      "teams": {
+        "red": {"operatives": {}, "spymasters": {}},
+        "blue": {"operatives": {}, "spymasters": {}}
+      }
+    },
+    "ctx": {
+      "currentPlayer": "0",
+      "phase": "lobby"
+    }
+  }
+}
