@@ -221,12 +221,14 @@ name = "cno"
 version = "0.1.0"
 source = { editable = "packages/cno" }
 dependencies = [
+    { name = "cluegen" },
     { name = "cno-sdk" },
     { name = "questionary" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "cluegen", editable = "packages/cluegen" },
     { name = "cno-sdk", editable = "packages/cno-sdk" },
     { name = "questionary", specifier = ">=2.0.0" },
 ]

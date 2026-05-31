@@ -6,22 +6,19 @@ import asyncio
 import logging
 import random
 
+from cno.clue_engine import ClueEngine, GeneratedClue
 from cno_sdk.client import CNOClient, GameEnded
 from cno_sdk.room import create_room
 from cno_sdk.state import (
+    GameState,
     TeamColor,
     friendly_unrevealed,
     is_operative_turn,
     is_seated,
-    pick_friendly_words,
     unrevealed_cards,
 )
 
 logger = logging.getLogger(__name__)
-
-HARDCODED_CLUE_WORDS = ("PINEAPPLE", "ORANGE", "GRAPE", "MELON", "CHERRY", "LEMON")
-HARDCODED_SELECTED_WORDS = ["HEAVEN", "BULB", "CHICK"]
-HARDCODED_COUNT = 3
 
 
 class SpymasterSession:
@@ -35,12 +32,14 @@ class SpymasterSession:
         nickname: str = "SpymasterBot",
         create_room_if_needed: bool = False,
         shutdown: asyncio.Event | None = None,
+        clue_engine: ClueEngine | None = None,
     ) -> None:
         self.team = team
         self.room = room
         self.nickname = nickname
         self.create_room_if_needed = create_room_if_needed or room is None
         self.shutdown = shutdown
+        self.clue_engine = clue_engine or ClueEngine()
         self.client: CNOClient | None = None
 
     async def run(self) -> str:
@@ -83,7 +82,6 @@ class SpymasterSession:
             await self.client.join_team(self.team, "spymasters")
         logger.info("Joined team. Waiting for turns...")
 
-        clue_round = 0
         while self.client.state.gameover is None:
             if self.shutdown and self.shutdown.is_set():
                 raise asyncio.CancelledError("Shutdown requested")
@@ -103,27 +101,31 @@ class SpymasterSession:
                 logger.info("Game ended (%s).", state.gameover)
                 break
 
-            friendly = friendly_unrevealed(state, self.team)
-            count = min(HARDCODED_COUNT, len(friendly))
-            if count < 1:
+            if not friendly_unrevealed(state, self.team):
                 continue
-            selected = pick_friendly_words(
-                state,
-                self.team,
-                HARDCODED_SELECTED_WORDS,
-                count,
-            )
-            clue_word = HARDCODED_CLUE_WORDS[clue_round % len(HARDCODED_CLUE_WORDS)]
+
+            clue = await self._generate_clue(state)
             logger.info(
                 "Our turn. Giving clue %s / %d (%s)",
-                clue_word,
-                len(selected),
-                ", ".join(selected),
+                clue.word,
+                len(clue.targets),
+                ", ".join(clue.targets),
             )
-            await self.client.give_clue(clue_word, selected)
-            clue_round += 1
+            await self.client.give_clue(clue.word, clue.targets)
 
         return self.room
+
+    async def _generate_clue(self, state: GameState) -> GeneratedClue:
+        try:
+            return await asyncio.to_thread(
+                self.clue_engine.generate,
+                state,
+                self.team,
+            )
+        except Exception as exc:
+            logger.warning("Clue generation failed (%s); using fallback clue.", exc)
+            fallback_targets = [card.word for card in friendly_unrevealed(state, self.team)][:3]
+            return GeneratedClue(word="HINT", targets=fallback_targets)
 
     async def close(self) -> None:
         if self.client is not None:
