@@ -6,10 +6,22 @@ import itertools
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import nltk
-from nltk.stem import SnowballStemmer
+from nltk.stem import SnowballStemmer, WordNetLemmatizer
 import numpy as np
+import ssl
 
-class CodenamesSpymaster:
+# Download WordNet for lemmatization
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+nltk.download('wordnet', quiet=True)
+
+
+class Spymaster:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         """
         Download selected model and initialize state variables.
@@ -21,6 +33,7 @@ class CodenamesSpymaster:
         # The global vocabulary the AI is allowed to use for clues
         self.vocabulary: dict = {}
         self.stemmer = SnowballStemmer("english")
+        self.lemmatizer = WordNetLemmatizer()
 
         # Stores vectors for all 25 words (should not be modified after initialization)
         self.master_board_cache: dict[str, np.ndarray] = {}
@@ -159,10 +172,12 @@ class CodenamesSpymaster:
         """
         candidate_lower = candidate.lower()
         candidate_stem = self.stemmer.stem(candidate_lower)
+        candidate_lemma = self.lemmatizer.lemmatize(candidate_lower)
 
         for word in visible_board_words:
             word_lower = word.lower()
             word_stem = self.stemmer.stem(word_lower)
+            word_lemma = self.lemmatizer.lemmatize(word_lower)
 
             # Check raw strings (catches simple substrings like "snow" in "snowman")
             if candidate_lower in word_lower or word_lower in candidate_lower:
@@ -170,6 +185,10 @@ class CodenamesSpymaster:
             
             # Check stemmed strings (catches morphological variants like "wives" vs "wife")
             if candidate_stem in word_stem or word_stem in candidate_stem:
+                return False
+            
+            # Check lemmatized strings (catches irregulars like "wives" vs "wife")
+            if candidate_lemma in word_lemma or word_lemma in candidate_lemma:
                 return False
 
         return True

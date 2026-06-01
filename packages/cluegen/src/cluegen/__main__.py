@@ -2,20 +2,15 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
-from cluegen.algos import CodenamesSpymaster
-
-
-def load_boards_from_json(filename: Path) -> list[dict]:
-    with open(filename, encoding="utf-8") as f:
-        return json.load(f)
+from cluegen.spymaster import Spymaster
+from cluegen.utils import load_boards_from_json
 
 
 def main() -> None:
     data_dir = Path(__file__).resolve().parents[2] / "data"
-    spymaster = CodenamesSpymaster()
+    spymaster = Spymaster()
     spymaster.load_vocabulary(str(data_dir / "advanced_vocab.txt"), verbose=True)
 
     boards = load_boards_from_json(data_dir / "test_boards.json")

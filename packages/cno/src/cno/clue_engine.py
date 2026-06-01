@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from cno_sdk.state import GameState, TeamColor
-from cluegen.algos import CodenamesSpymaster
+from cluegen.spymaster import Spymaster
 
 logger = logging.getLogger(__name__)
 
@@ -72,13 +72,13 @@ class ClueEngine:
 
     def __init__(self, *, vocab_path: Path | None = None) -> None:
         self._vocab_path = vocab_path or default_vocab_path()
-        self._spymaster: CodenamesSpymaster | None = None
+        self._spymaster: Spymaster | None = None
         self._board_words: tuple[str, ...] | None = None
 
-    def _ensure_loaded(self) -> CodenamesSpymaster:
+    def _ensure_loaded(self) -> Spymaster:
         if self._spymaster is None:
             logger.info("Loading clue vocabulary from %s...", self._vocab_path)
-            spymaster = CodenamesSpymaster()
+            spymaster = Spymaster()
             with contextlib.redirect_stdout(io.StringIO()):
                 spymaster.load_vocabulary(str(self._vocab_path))
             self._spymaster = spymaster
