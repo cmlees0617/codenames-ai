@@ -5,6 +5,7 @@ import wordfreq
 from pathlib import Path
 import nltk
 from nltk.corpus import stopwords
+import unicodedata
 import ssl
 
 try:
@@ -26,17 +27,22 @@ def generate_vocab(zipf_cutoff: float) -> list[str]:
     """
     vocab = []
 
-    for word in wordfreq.iter_wordlist('en'):
+    for raw_word in wordfreq.iter_wordlist('en'):
+        # Strip accents: normalizes string and encodes to ASCII (ignoring bad chars), then decodes back
+        word = unicodedata.normalize('NFKD', raw_word).encode('ASCII', 'ignore').decode('utf-8')
+        
         if len(word) < 3 or not word.isalpha() or word in STOP_WORDS:
             continue
 
-        score = wordfreq.zipf_frequency(word, 'en')
+        score = wordfreq.zipf_frequency(raw_word, 'en') # Use raw_word for accurate frequency score
 
         # iter_wordlist goes from most to least common
         if score <= zipf_cutoff:
             break
          
-        vocab.append(word)
+        # Avoid adding duplicates if two different accented words resolve to the same base word
+        if word not in vocab:
+            vocab.append(word)
 
     return vocab
         

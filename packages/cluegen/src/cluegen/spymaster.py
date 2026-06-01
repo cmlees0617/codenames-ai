@@ -49,6 +49,9 @@ class Spymaster:
         
         # Raw strings of the active board (used for legality checks and output)
         self.target_strings: list[str] = []
+        self.assassin_strings: list[str] = []
+        self.enemy_strings: list[str] = []
+        self.civilian_strings: list[str] = []
         self.visible_strings: list[str] = []
 
     def load_vocabulary(self, filepath: str, verbose: bool = False):
@@ -154,6 +157,9 @@ class Spymaster:
 
         # Save raw strings for legality checking and generation loops
         self.target_strings = [t.upper() for t in targets]
+        self.civilian_strings = [c.upper() for c in civilians]
+        self.enemy_strings = [e.upper() for e in enemies] 
+        self.assassin_strings = [a.upper() for a in assassins]
         self.visible_strings = [w.upper() for w in (targets + civilians + enemies + assassins)]
         
         # Pull vectors instantly from the cache
