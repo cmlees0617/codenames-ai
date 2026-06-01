@@ -1,5 +1,5 @@
 """Offline Codenames spymaster clue generation."""
 
-from cluegen.algos import CodenamesSpymaster
+from cluegen.spymaster import Spymaster
 
-__all__ = ["CodenamesSpymaster"]
+__all__ = ["Spymaster"]
