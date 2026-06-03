@@ -6,10 +6,16 @@ import argparse
 import asyncio
 import logging
 
+from cno.bots.operative import CNOOperativeBot
+from cno.bots.spymaster import AutoCNOSpymasterBot, InteractiveCNOSpymasterBot
 from cno.interactive import prompt_interactive
 from cno.roles import default_nickname, parse_role
-from cno.session import OperativeSession, SpymasterSession
 from cno.shutdown import ShutdownController
+from cluegen.algorithms import (
+    CluegenClueAlgorithm,
+    EmbeddingGuessAlgorithm,
+    RandomGuessAlgorithm,
+)
 
 
 def parse_role_arg(role: str):
@@ -40,23 +46,49 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Display name in the room (defaults to role-based name)",
     )
+    parser.add_argument(
+        "--interactive",
+        action="store_true",
+        help="Spymaster only: pick from top-ranked clues instead of auto-selecting",
+    )
+    parser.add_argument(
+        "--random-operative",
+        action="store_true",
+        help="Operative only: guess random tiles instead of embedding similarity",
+    )
     return parser
 
 
-def _build_session(args: argparse.Namespace, shutdown: asyncio.Event):
+def _build_player(args: argparse.Namespace, shutdown: asyncio.Event):
     team, role = args.role
     nickname = args.nickname or default_nickname(team, role)
 
     if role == "spymasters":
-        return SpymasterSession(
-            team=team,
+        clue_algorithm = CluegenClueAlgorithm()
+        if args.interactive:
+            return InteractiveCNOSpymasterBot(
+                team,
+                clue_algorithm,
+                room=args.room,
+                nickname=nickname,
+                shutdown=shutdown,
+            )
+        return AutoCNOSpymasterBot(
+            team,
+            clue_algorithm,
             room=args.room,
             nickname=nickname,
             shutdown=shutdown,
         )
     if role == "operatives":
-        return OperativeSession(
-            team=team,
+        guess_algorithm = (
+            RandomGuessAlgorithm()
+            if args.random_operative
+            else EmbeddingGuessAlgorithm()
+        )
+        return CNOOperativeBot(
+            team,
+            guess_algorithm,
             room=args.room,
             nickname=nickname,
             shutdown=shutdown,
@@ -88,15 +120,15 @@ async def _async_main(args: argparse.Namespace) -> int:
 
     shutdown = ShutdownController()
     try:
-        session = _build_session(args, shutdown.event)
+        player = _build_player(args, shutdown.event)
     except ValueError as exc:
         logging.error("%s", exc)
         return 1
 
-    run_task = asyncio.create_task(session.run())
+    run_task = asyncio.create_task(player.play())
     shutdown.install(
         asyncio.get_running_loop(),
-        session.close,
+        player.close,
         run_task=run_task,
     )
 
@@ -107,7 +139,7 @@ async def _async_main(args: argparse.Namespace) -> int:
         logging.info("Interrupted.")
         return 130
     finally:
-        await shutdown.close(session.close)
+        await shutdown.close(player.close)
 
 
 def main(argv: list[str] | None = None) -> None:

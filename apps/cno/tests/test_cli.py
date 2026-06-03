@@ -69,6 +69,8 @@ def test_main_uses_interactive_when_no_argv(monkeypatch):
             room="demo-room",
             role=("red", "spymasters"),
             nickname="Bot",
+            interactive=False,
+            random_operative=False,
         )
 
     async def fake_async_main(args: object) -> int:

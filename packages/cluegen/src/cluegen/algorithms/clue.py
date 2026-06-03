@@ -1,14 +1,15 @@
-"""Bridge codenames.game state to cluegen clue generation."""
+"""Cluegen-backed clue ranking."""
 
 from __future__ import annotations
 
 import contextlib
 import io
 import logging
-from dataclasses import dataclass
 from pathlib import Path
 
-from cno_sdk.state import GameState, TeamColor
+from game_core.types import Clue
+from game_core.views import SpymasterView
+
 from cluegen.spymaster import Spymaster
 
 logger = logging.getLogger(__name__)
@@ -18,57 +19,46 @@ MAX_TARGETS = 3
 
 
 def default_vocab_path() -> Path:
-    return Path(__file__).resolve().parents[3] / "cluegen" / "data" / DEFAULT_VOCAB
+    return Path(__file__).resolve().parents[3] / "data" / DEFAULT_VOCAB
 
 
-def enemy_team(team: TeamColor) -> TeamColor:
+def _enemy_team(team: str) -> str:
     return "blue" if team == "red" else "red"
 
 
-@dataclass(frozen=True)
-class BoardCategories:
-    targets: list[str]
-    civilians: list[str]
-    enemies: list[str]
-    assassins: list[str]
-
-
-def board_categories(state: GameState, team: TeamColor) -> BoardCategories:
-    """Split unrevealed cards into cluegen board buckets for ``team``."""
-    opponent = enemy_team(team)
+def _categories_from_view(state: SpymasterView) -> tuple[list[str], list[str], list[str], list[str]]:
+    opponent = _enemy_team(state.team)
     targets: list[str] = []
     civilians: list[str] = []
     enemies: list[str] = []
     assassins: list[str] = []
 
-    for card in state.grid:
+    for card in state.board:
         if card.revealed:
             continue
-        if card.color == team:
+        if card.color == state.team:
             targets.append(card.word)
         elif card.color == opponent:
             enemies.append(card.word)
-        elif card.color == "neutral":
+        elif card.color == "civilian":
             civilians.append(card.word)
-        elif card.color == "black":
+        elif card.color == "assassin":
             assassins.append(card.word)
 
-    return BoardCategories(
-        targets=targets,
-        civilians=civilians,
-        enemies=enemies,
-        assassins=assassins,
+    return targets, civilians, enemies, assassins
+
+
+def _result_to_clue(result: dict) -> Clue:
+    targets = tuple(result["intended_targets"])
+    return Clue(
+        word=result["word"],
+        count=len(targets),
+        intended_targets=targets,
     )
 
 
-@dataclass(frozen=True)
-class GeneratedClue:
-    word: str
-    targets: list[str]
-
-
-class ClueEngine:
-    """Lazy-loaded cluegen wrapper for live spymaster turns."""
+class CluegenClueAlgorithm:
+    """Rank clues using semantic embeddings (cluegen Spymaster engine)."""
 
     def __init__(self, *, vocab_path: Path | None = None) -> None:
         self._vocab_path = vocab_path or default_vocab_path()
@@ -85,8 +75,8 @@ class ClueEngine:
             logger.info("Clue vocabulary ready.")
         return self._spymaster
 
-    def _ensure_board(self, state: GameState) -> None:
-        board_words = tuple(card.word for card in state.grid)
+    def _ensure_board(self, state: SpymasterView) -> None:
+        board_words = tuple(card.word for card in state.board)
         if self._board_words == board_words:
             return
         spymaster = self._ensure_loaded()
@@ -94,30 +84,28 @@ class ClueEngine:
             spymaster.initialize_game_board(list(board_words))
         self._board_words = board_words
 
-    def generate(self, state: GameState, team: TeamColor) -> GeneratedClue:
-        categories = board_categories(state, team)
-        if not categories.targets:
-            raise ValueError("No unrevealed friendly cards to clue")
+    def rank_clues(self, state: SpymasterView, *, limit: int = 10) -> list[Clue]:
+        targets, civilians, enemies, assassins = _categories_from_view(state)
+        if not targets:
+            return []
 
         self._ensure_board(state)
         spymaster = self._ensure_loaded()
-        max_targets = min(MAX_TARGETS, len(categories.targets))
+        max_targets = min(MAX_TARGETS, len(targets))
 
         with contextlib.redirect_stdout(io.StringIO()):
             spymaster.update_board_state(
-                targets=categories.targets,
-                civilians=categories.civilians,
-                enemies=categories.enemies,
-                assassins=categories.assassins,
+                targets=targets,
+                civilians=civilians,
+                enemies=enemies,
+                assassins=assassins,
             )
             spymaster.prune_vocabulary()
-            result = spymaster.generate_clue(
+            results = spymaster.generate_ranked_clues(
                 min_targets=1,
                 max_targets=max_targets,
+                limit=limit,
             )
 
-        targets = list(result["intended_targets"])
-        if not result["word"] or not targets:
-            raise ValueError("Cluegen returned an empty clue")
-
-        return GeneratedClue(word=result["word"], targets=targets)
+        clues = [_result_to_clue(result) for result in results if result.get("word")]
+        return clues[:limit]

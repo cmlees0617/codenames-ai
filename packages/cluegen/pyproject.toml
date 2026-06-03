@@ -2,8 +2,9 @@
 name = "cluegen"
 version = "0.1.0"
 description = "Offline Codenames spymaster clue generation using semantic embeddings"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
+    "game-core",
     "numpy",
     "sentence-transformers",
     "scikit-learn",
@@ -12,6 +13,9 @@ dependencies = [
     "transformers>=5.9.0",
     "accelerate>=1.13.0",
 ]
+
+[tool.uv.sources]
+game-core = { workspace = true }
 
 [build-system]
 requires = ["uv_build>=0.11.16,<0.12"]

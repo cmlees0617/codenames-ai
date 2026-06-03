@@ -1,17 +1,25 @@
 [project]
 name = "codenames-ai"
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 
 [tool.uv.workspace]
-members = ["packages/*"]
+members = ["apps/*", "packages/*"]
 
 [dependency-groups]
-dev = ["pytest", "pytest-asyncio", "ruff"]
+dev = ["pytest", "pytest-asyncio", "ruff", "cno"]
+
+[tool.uv.sources]
+cno = { workspace = true }
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["packages/cno-sdk/tests", "packages/cno/tests"]
+testpaths = [
+    "packages/game-core/tests",
+    "packages/cno-sdk/tests",
+    "packages/cluegen/tests",
+    "apps/cno/tests",
+]
 markers = [
     "integration: live tests that require network access to codenames.game",
 ]

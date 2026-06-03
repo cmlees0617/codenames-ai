@@ -2,17 +2,18 @@
 
 Python tools for playing [Codenames Online](https://codenames.game): a protocol SDK, a CLI bot, and an offline clue engine.
 
-## Packages
+## Layout
 
-| Package | Description |
-|---------|-------------|
-| `cno-sdk` | Low-level Socket.IO / boardgame.io client for codenames.game |
-| `cno` | CLI and high-level bot sessions (`cno` command) |
-| `cluegen` | Offline clue generation using semantic embeddings |
+| Path | Description |
+|------|-------------|
+| `apps/cno` | CLI (`cno` command) and CNO player bots |
+| `packages/cno-sdk` | Low-level Socket.IO / boardgame.io client |
+| `packages/cluegen` | `ClueAlgorithm` / `GuessAlgorithm` implementations |
+| `packages/game-core` | Role views, types, and player/algorithm protocols |
 
 ## Requirements
 
-- Python 3.11+
+- Python 3.12+
 - [uv](https://docs.astral.sh/uv/)
 
 ## Setup
@@ -39,17 +40,23 @@ uv run cno halok-jonah red-spymaster
 
 # Blue operative with a custom nickname
 uv run cno halok-jonah blue-operative --nickname MyBot
+
+# Spymaster: pick from top 10 ranked clues
+uv run cno halok-jonah red-spymaster --interactive
+
+# Operative: random guesses instead of embeddings
+uv run cno halok-jonah blue-operative --random-operative
 ```
 
 Roles: `red-spymaster`, `blue-spymaster`, `red-operative`, `blue-operative`.
 
 If you omit `--nickname`, the bot uses a role-based default (e.g. `RedSpymasterBot`, `BlueOperativeBot`). Logging is always at DEBUG.
 
-The bot joins the room, waits for its role each turn, and plays until the game ends. Spymaster bots give clues on every turn; operative bots guess random tiles.
+Spymaster bots use `CluegenClueAlgorithm` (auto or interactive). Operative bots use `EmbeddingGuessAlgorithm` by default.
 
 ```bash
 # Full automated game (4 bots) — integration test
-uv run pytest packages/cno/tests/test_live_full_game.py -m integration
+uv run pytest apps/cno/tests/test_live_full_game.py -m integration
 ```
 
 Session tokens are logged to `~/.codenames-ai/sessions.jsonl` so disconnected players can be reconnected and removed later. Ctrl+C leaves the room cleanly.
