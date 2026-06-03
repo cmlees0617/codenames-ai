@@ -287,3 +287,79 @@ class Spymaster:
                         print(f"\tBest Clue Yet: {best_clue}")
                         
         return best_clue
+
+    def generate_ranked_clues(
+        self,
+        min_targets: int = 1,
+        max_targets: int = 3,
+        *,
+        limit: int = 10,
+        size_bonus: float = 0.15,
+        alpha: float = 0.2,
+        beta: float = 0.4,
+        gamma: float = 1.0,
+    ) -> list[dict]:
+        """Return up to ``limit`` distinct clues sorted by score (best first)."""
+        if not self.vocabulary:
+            raise ValueError("Vocabulary is empty. Call load_vocabulary() first.")
+        if not self.board_state["is_initialized"]:
+            raise ValueError("Board state not initialized. Call update_board_state() first.")
+
+        max_search_size = min(max_targets, len(self.target_strings))
+        if max_search_size < 1:
+            raise ValueError("Cannot search for groups of size < 1.")
+        if min_targets > max_search_size:
+            raise ValueError("min_targets cannot be greater than max_targets.")
+
+        legal_words = []
+        legal_vectors = []
+        for word, vec in self.vocabulary.items():
+            if self.is_legal_clue(word, self.visible_strings):
+                legal_words.append(word)
+                legal_vectors.append(vec)
+
+        if not legal_words:
+            raise ValueError("No legal words left in vocabulary.")
+
+        legal_matrix = np.array(legal_vectors)
+
+        def get_max_sims(board_key):
+            vectors = self.board_state[board_key]
+            if not vectors:
+                return np.zeros(len(legal_words))
+            neg_matrix = np.array(vectors)
+            sims = cosine_similarity(legal_matrix, neg_matrix)
+            return sims.max(axis=1)
+
+        max_civ = get_max_sims("civilians")
+        max_enemy = get_max_sims("enemies")
+        max_assassin = get_max_sims("assassins")
+        penalty_array = (alpha * max_civ) + (beta * max_enemy) + (gamma * max_assassin)
+        target_matrix_full = np.array(self.board_state["targets"])
+
+        candidates: dict[str, dict] = {}
+        target_indices = range(len(self.target_strings))
+        for group_size in range(min_targets, max_search_size + 1):
+            for group in itertools.combinations(target_indices, group_size):
+                group_indices = list(group)
+                dummy_matrix = target_matrix_full[group_indices]
+                dummy_strings = [self.target_strings[i] for i in group_indices]
+                target_sims = cosine_similarity(legal_matrix, dummy_matrix)
+                min_target = target_sims.min(axis=1)
+                avg_target = target_sims.mean(axis=1)
+                blended_target_score = (min_target + avg_target) / 2
+                adjusted_scores = (
+                    blended_target_score - penalty_array + ((group_size - 2) * size_bonus)
+                )
+                for idx, score in enumerate(adjusted_scores):
+                    word = legal_words[idx].upper()
+                    entry = {
+                        "word": word,
+                        "score": float(score),
+                        "intended_targets": dummy_strings,
+                    }
+                    if word not in candidates or score > candidates[word]["score"]:
+                        candidates[word] = entry
+
+        ranked = sorted(candidates.values(), key=lambda item: item["score"], reverse=True)
+        return ranked[:limit]

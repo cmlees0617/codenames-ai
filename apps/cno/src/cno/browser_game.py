@@ -6,9 +6,10 @@ import asyncio
 import logging
 from dataclasses import dataclass
 
-from cno.session import SpymasterSession
+from cno.bots.spymaster import AutoCNOSpymasterBot, InteractiveCNOSpymasterBot
 from cno_sdk.client import CNOClient
 from cno_sdk.room import create_room
+from cluegen.algorithms import CluegenClueAlgorithm
 
 logger = logging.getLogger(__name__)
 
@@ -18,13 +19,14 @@ class SpymasterGameHandle:
     room: str
     url: str
     host: CNOClient
-    red_sm: SpymasterSession
-    blue_sm: SpymasterSession
+    red_sm: AutoCNOSpymasterBot | InteractiveCNOSpymasterBot
+    blue_sm: AutoCNOSpymasterBot | InteractiveCNOSpymasterBot
 
 
 async def start_spymaster_game(
     *,
     shutdown: asyncio.Event | None = None,
+    interactive: bool = False,
 ) -> SpymasterGameHandle:
     """Create a room, seat two spymaster bots, and start the match."""
     created = await create_room(nickname="GameHost")
@@ -48,10 +50,24 @@ async def start_spymaster_game(
         await client.request_sync()
         await asyncio.wait_for(client._synced.wait(), timeout=10)
 
-    red_sm = SpymasterSession("red", room=room, nickname="RedSpymaster", shutdown=shutdown)
-    red_sm.client = red_client
-    blue_sm = SpymasterSession("blue", room=room, nickname="BlueSpymaster", shutdown=shutdown)
-    blue_sm.client = blue_client
+    clue_algorithm = CluegenClueAlgorithm()
+    bot_cls = InteractiveCNOSpymasterBot if interactive else AutoCNOSpymasterBot
+    red_sm = bot_cls(
+        "red",
+        clue_algorithm,
+        room=room,
+        nickname="RedSpymaster",
+        shutdown=shutdown,
+        client=red_client,
+    )
+    blue_sm = bot_cls(
+        "blue",
+        clue_algorithm,
+        room=room,
+        nickname="BlueSpymaster",
+        shutdown=shutdown,
+        client=blue_client,
+    )
 
     return SpymasterGameHandle(
         room=room,
@@ -69,14 +85,14 @@ async def run_spymaster_bots(
 ) -> object | None:
     """Run spymaster bot loops until the game ends."""
     tasks = [
-        asyncio.create_task(handle.red_sm.run()),
-        asyncio.create_task(handle.blue_sm.run()),
+        asyncio.create_task(handle.red_sm.play()),
+        asyncio.create_task(handle.blue_sm.play()),
     ]
     try:
         await asyncio.wait_for(asyncio.gather(*tasks), timeout=game_timeout)
     finally:
-        for session in (handle.red_sm, handle.blue_sm):
-            await session.close()
+        for bot in (handle.red_sm, handle.blue_sm):
+            await bot.close()
         winner = handle.host.state.gameover
         await handle.host.leave()
         return winner

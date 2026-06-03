@@ -71,4 +71,6 @@ def prompt_interactive() -> argparse.Namespace:
         room=room,
         role=(team, role),
         nickname=nickname,
+        interactive=False,
+        random_operative=False,
     )
