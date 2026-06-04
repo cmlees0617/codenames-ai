@@ -14,7 +14,7 @@ Depends on **`game-core` only**.
 
 ```text
 packages/clue-eval/
-  data/                    # test_boards.json, words.txt, future case data
+  data/                    # test_boards.json, words.txt, glove-wiki-gigaword-300.npz
   src/clue_eval/
     boards/                # layouts, factory, SpymasterView conversion
     scenarios/             # Scenario + ScenarioRunner
@@ -59,6 +59,51 @@ uv run python -m clue_eval --stub
 | `expected_targets` | Optional pass/fail on top clue's `intended_targets` |
 
 Algorithm-specific options (e.g. vocabulary pruning) live on **your** implementation, not on `Scenario`.
+
+## Board difficulty and stratified generation
+
+Per-team difficulty (GloVe cosine similarity, default ``beta=2.0``):
+
+```text
+difficulty = avg_sim(targets, targets)
+             / (avg_sim(targets, others) + beta * max_sim(targets, assassin))
+```
+
+- **Blue** targets = ``blues``; others = ``reds`` + ``civilians`` + ``assassins``
+- **Red** targets = ``reds``; others = ``blues`` + ``civilians`` + ``assassins``
+
+``FixtureBoard`` may include ``difficulty: {"blue": float, "red": float}``.
+
+Generate ``n`` boards with evenly spaced mean difficulty:
+
+```python
+from clue_eval.embeddings import EmbeddingStore
+from clue_eval.boards import BoardFactory
+
+store = EmbeddingStore.load()
+boards = BoardFactory.generate_uniform_difficulty_boards(10, store, seed=0)
+```
+
+## Word embeddings (GloVe)
+
+The Codenames word list (`data/words.txt`, 400 words) has precomputed **glove-wiki-gigaword-300** vectors in `data/glove-wiki-gigaword-300.npz` (300 dimensions). GloVe is a strong static baseline for word similarity; it is not contextual like sentence-transformers.
+
+Regenerate after changing `words.txt`:
+
+```bash
+uv sync --package clue-eval --extra embeddings
+uv run --extra embeddings clue-eval-embed
+# or: uv run --extra embeddings python -m clue_eval.embeddings
+```
+
+Load in code:
+
+```python
+from clue_eval.embeddings import EmbeddingStore
+
+store = EmbeddingStore.load()
+vec = store.vector_for("APPLE")
+```
 
 ## Optional example package
 

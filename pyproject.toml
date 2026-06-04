@@ -50,6 +50,7 @@ extend-exclude = [
     "packages/cluegen/src/cluegen/generate_vocab.py",
     "packages/cluegen/src/cluegen/__main__.py",
     "packages/cluegen/src/cluegen/viz/embeddings.py",
+    "packages/clue-eval/src/clue_eval/embeddings/generate.py",
 ]
 
 [tool.ruff.lint]

@@ -5,7 +5,16 @@ description = "Model-agnostic tools for testing and benchmarking Codenames clue 
 requires-python = ">=3.12"
 dependencies = [
     "game-core",
+    "numpy",
 ]
+
+[project.optional-dependencies]
+embeddings = [
+    "gensim>=4.3.2",
+]
+
+[project.scripts]
+clue-eval-embed = "clue_eval.embeddings.generate:main"
 
 [tool.uv.sources]
 game-core = { workspace = true }

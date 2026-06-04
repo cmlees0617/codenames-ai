@@ -12,3 +12,7 @@ def package_data_dir() -> Path:
 
 def default_test_boards_path() -> Path:
     return package_data_dir() / "test_boards.json"
+
+
+def default_words_path() -> Path:
+    return package_data_dir() / "words.txt"

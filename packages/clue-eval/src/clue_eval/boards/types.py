@@ -14,7 +14,15 @@ class BoardLayout(TypedDict):
     assassins: list[str]
 
 
+class BoardDifficultyDict(TypedDict):
+    """Per-team difficulty scores attached to generated fixture boards."""
+
+    blue: float
+    red: float
+
+
 class FixtureBoard(BoardLayout, total=False):
     """Fixed board for offline evaluation."""
 
     id: NotRequired[int]
+    difficulty: NotRequired[BoardDifficultyDict]
