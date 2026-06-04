@@ -21,4 +21,4 @@ def guess_word(self, state: OperativeView) -> GuessAction:
 | `RandomGuessAlgorithm` | `cluegen.algorithms` | Random unrevealed tile |
 | `ScriptedGuessAlgorithm` | `cluegen.algorithms` | Queued guesses for tests |
 
-**Source:** [`packages/game-core/src/game_core/algorithms.py`](../../packages/game-core/src/game_core/algorithms.py)
+**Source:** [`algorithms.py`](https://github.com/cmlees0617/codenames-ai/blob/main/packages/game-core/src/game_core/algorithms.py)

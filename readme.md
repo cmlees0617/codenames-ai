@@ -12,7 +12,7 @@ Python tools for playing [Codenames Online](https://codenames.game): a protocol 
 | `packages/cluegen` | `ClueAlgorithm` / `GuessAlgorithm` implementations |
 | `packages/game-core` | Role views, types, and player/algorithm protocols |
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for layer rules and [docs/README.md](docs/README.md) for interface and implementation reference.
+**Contributor documentation:** [docs/index.md](docs/index.md) (MkDocs). Local preview: `uv run mkdocs serve`. Covers architecture, interfaces, contributor guides, CLI reference, ADRs, and selective API docs.
 
 ## Requirements
 
@@ -135,10 +135,10 @@ Higher penalties reduce false positives at the cost of fewer valid clues.
 uv run python -m cluegen
 ```
 
-## Tests and lint
+## Tests, lint, and docs
 
 ```bash
-uv sync --group dev
+uv sync --all-packages --group dev
 
 # Unit tests
 uv run pytest -m "not integration"
@@ -146,6 +146,9 @@ uv run pytest -m "not integration"
 # Ruff (Python 3.12 + UP) and mypy (strict on game-core, cno-bots, cno, cluegen.algorithms)
 uv run ruff check apps packages
 uv run mypy -p game_core -p cno_bots -p cno -p cluegen.algorithms
+
+# Contributor docs (MkDocs + Material + mkdocstrings + Mermaid)
+uv run mkdocs serve
 
 # Live integration tests (network required)
 uv run pytest -m integration

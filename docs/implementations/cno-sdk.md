@@ -1,6 +1,6 @@
 # cno-sdk
 
-**Path:** [`packages/cno-sdk`](../../packages/cno-sdk)
+**Path:** [`packages/cno-sdk`](https://github.com/cmlees0617/codenames-ai/tree/main/packages/cno-sdk)
 
 ## Responsibility
 
@@ -18,4 +18,4 @@ Low-level client for [codenames.game](https://codenames.game):
 
 `TeamColor`, `Role`, `BoardCard` in `cno_sdk.state` — literals aligned with [`game_core.types`](../interfaces/types-and-views.md).
 
-**Source:** [`packages/cno-sdk/src/cno_sdk/`](../../packages/cno-sdk/src/cno_sdk/)
+**Source:** [`packages/cno-sdk/src/cno_sdk/`](https://github.com/cmlees0617/codenames-ai/tree/main/packages/cno-sdk/src/cno_sdk)

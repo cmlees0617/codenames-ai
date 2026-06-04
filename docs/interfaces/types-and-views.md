@@ -24,4 +24,4 @@
 
 `cno_sdk.state` defines the same `TeamColor` and `Role` literals without importing `game-core`. **`cno_bots.views`** maps `GameState` into these views. Keep literals in sync when adding teams or roles.
 
-**Source:** [`packages/game-core/src/game_core/types.py`](../../packages/game-core/src/game_core/types.py), [`views.py`](../../packages/game-core/src/game_core/views.py)
+**Source:** [`types.py`](https://github.com/cmlees0617/codenames-ai/blob/main/packages/game-core/src/game_core/types.py), [`views.py`](https://github.com/cmlees0617/codenames-ai/blob/main/packages/game-core/src/game_core/views.py)

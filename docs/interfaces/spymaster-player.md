@@ -23,4 +23,4 @@ Uses a [`ClueAlgorithm`](clue-algorithm.md) internally; does not expose algorith
 
 Constructor accepts optional `select_clue` callback (provided by the CLI for interactive play).
 
-**Source:** [`packages/game-core/src/game_core/players.py`](../../packages/game-core/src/game_core/players.py)
+**Source:** [`players.py`](https://github.com/cmlees0617/codenames-ai/blob/main/packages/game-core/src/game_core/players.py)

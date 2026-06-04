@@ -1,6 +1,6 @@
 # game-core
 
-**Path:** [`packages/game-core`](../../packages/game-core)
+**Path:** [`packages/game-core`](https://github.com/cmlees0617/codenames-ai/tree/main/packages/game-core)
 
 ## Responsibility
 

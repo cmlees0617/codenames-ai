@@ -1,6 +1,6 @@
 # cno-bots
 
-**Path:** [`packages/cno-bots`](../../packages/cno-bots)
+**Path:** [`packages/cno-bots`](https://github.com/cmlees0617/codenames-ai/tree/main/packages/cno-bots)
 
 ## Responsibility
 

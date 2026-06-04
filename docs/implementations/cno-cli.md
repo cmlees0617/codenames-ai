@@ -1,6 +1,6 @@
 # apps/cno (CLI)
 
-**Path:** [`apps/cno`](../../apps/cno)
+**Path:** [`apps/cno`](https://github.com/cmlees0617/codenames-ai/tree/main/apps/cno)
 
 ## Responsibility
 
@@ -26,4 +26,4 @@ uv run cno [room] [role] [--interactive] [--random-operative]
 
 No game logic in this package.
 
-**Script:** `cno = cno.cli:main` in [`apps/cno/pyproject.toml`](../../apps/cno/pyproject.toml)
+**Script:** `cno = cno.cli:main` in [`apps/cno/pyproject.toml`](https://github.com/cmlees0617/codenames-ai/blob/main/apps/cno/pyproject.toml)

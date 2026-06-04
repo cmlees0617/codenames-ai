@@ -25,4 +25,4 @@ Today, [`CNOSpymasterBot`](../implementations/cno-bots.md) and [`CNOOperativeBot
 
 When a second backend is added, implement `GameBackend` in its package and refactor CNO bots to accept a backend instance.
 
-**Source:** [`packages/game-core/src/game_core/backends.py`](../../packages/game-core/src/game_core/backends.py)
+**Source:** [`backends.py`](https://github.com/cmlees0617/codenames-ai/blob/main/packages/game-core/src/game_core/backends.py)

@@ -1,6 +1,6 @@
 # cluegen
 
-**Path:** [`packages/cluegen`](../../packages/cluegen)
+**Path:** [`packages/cluegen`](https://github.com/cmlees0617/codenames-ai/tree/main/packages/cluegen)
 
 ## Public API
 

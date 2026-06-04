@@ -19,4 +19,4 @@ async def close(self) -> None: ...
 |-------|---------|
 | `CNOOperativeBot` | `cno_bots.bots.operative` |
 
-**Source:** [`packages/game-core/src/game_core/players.py`](../../packages/game-core/src/game_core/players.py)
+**Source:** [`players.py`](https://github.com/cmlees0617/codenames-ai/blob/main/packages/game-core/src/game_core/players.py)

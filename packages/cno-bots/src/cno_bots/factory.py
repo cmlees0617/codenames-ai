@@ -21,6 +21,8 @@ from cno_bots.bots.spymaster import CNOSpymasterBot
 
 @dataclass(frozen=True, slots=True)
 class PlayerBuildOptions:
+    """Inputs for :func:`build_player` (CLI and tests use this)."""
+
     team: TeamColor
     role: Role
     room: str
@@ -31,6 +33,7 @@ class PlayerBuildOptions:
 
 
 def build_player(options: PlayerBuildOptions) -> SpymasterPlayer | OperativePlayer:
+    """Return a spymaster or operative bot wired to default clue/guess algorithms."""
     if options.role == "spymasters":
         return _build_spymaster(options)
     if options.role == "operatives":
