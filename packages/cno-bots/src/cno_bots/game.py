@@ -6,39 +6,40 @@ import asyncio
 import logging
 from dataclasses import dataclass
 
-from cno.bots.operative import CNOOperativeBot
-from cno.bots.spymaster import AutoCNOSpymasterBot
-from cno_sdk.client import CNOClient
-from cno_sdk.room import create_room
-from cno_sdk.state import TeamColor
 from cluegen.algorithms import (
     CluegenClueAlgorithm,
     ScriptedClueAlgorithm,
     ScriptedGuessAlgorithm,
 )
+from cno_sdk.client import CNOClient
+from cno_sdk.room import create_room
+from cno_sdk.state import GameState, TeamColor
+from game_core.algorithms import ClueAlgorithm
 from game_core.types import Clue
+
+from cno_bots.bots.operative import CNOOperativeBot
+from cno_bots.bots.spymaster import CNOSpymasterBot
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class FullGameResult:
     room: str
     url: str
     winner: object | None
 
 
-def _build_scripted_guesses(state, team: TeamColor) -> list[str | None]:
-    """Guess friendly words first, then pass when no guesses remain."""
+def _build_scripted_guesses(state: GameState, team: TeamColor) -> list[str | None]:
     friendly = [
         card.word
         for card in state.grid
         if card.color == team and not card.revealed
     ]
-    return [word for word in friendly] + [None]
+    return [*friendly, None]
 
 
-def _scripted_clue_for_team(state, team: TeamColor) -> Clue:
+def _scripted_clue_for_team(state: GameState, team: TeamColor) -> Clue:
     targets = tuple(
         card.word
         for card in state.grid
@@ -86,12 +87,13 @@ async def run_full_game(
     grid_state = host.state
 
     if use_cluegen:
-        clue_algo_red = clue_algo_blue = CluegenClueAlgorithm()
+        clue_algo_red: ClueAlgorithm = CluegenClueAlgorithm()
+        clue_algo_blue: ClueAlgorithm = CluegenClueAlgorithm()
     else:
         clue_algo_red = ScriptedClueAlgorithm([_scripted_clue_for_team(grid_state, "red")])
         clue_algo_blue = ScriptedClueAlgorithm([_scripted_clue_for_team(grid_state, "blue")])
 
-    red_sm = AutoCNOSpymasterBot(
+    red_sm = CNOSpymasterBot(
         "red",
         clue_algo_red,
         room=room,
@@ -99,7 +101,7 @@ async def run_full_game(
         shutdown=shutdown,
         client=red_sm_client,
     )
-    blue_sm = AutoCNOSpymasterBot(
+    blue_sm = CNOSpymasterBot(
         "blue",
         clue_algo_blue,
         room=room,
@@ -124,7 +126,7 @@ async def run_full_game(
         client=blue_op_client,
     )
 
-    players = [red_sm, blue_sm, red_op, blue_op]
+    players: list[CNOSpymasterBot | CNOOperativeBot] = [red_sm, blue_sm, red_op, blue_op]
     tasks = [asyncio.create_task(player.play()) for player in players]
 
     try:

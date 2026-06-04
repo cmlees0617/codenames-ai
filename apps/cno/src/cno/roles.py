@@ -1,10 +1,10 @@
-"""Role parsing helpers for the cno CLI."""
+"""Parse CLI role strings into cno-sdk team and role literals."""
 
 from __future__ import annotations
 
 from cno_sdk.state import Role, TeamColor
 
-ROLE_CHOICES = {
+ROLE_CHOICES: dict[str, tuple[TeamColor, Role]] = {
     "red-spymaster": ("red", "spymasters"),
     "blue-spymaster": ("blue", "spymasters"),
     "red-operative": ("red", "operatives"),

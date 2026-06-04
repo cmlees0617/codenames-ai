@@ -1,11 +1,13 @@
-"""Interactive prompts for the cno CLI."""
+"""Interactive prompts for the cno CLI (terminal UI only)."""
 
 from __future__ import annotations
 
 import argparse
 import sys
+from typing import cast
 
 import questionary
+from game_core.types import Clue
 from questionary import Style
 
 from cno.roles import default_nickname, parse_role
@@ -28,7 +30,7 @@ def _select(title: str, options: list[str]) -> str:
     ).ask()
     if choice is None:
         raise SystemExit(0)
-    return choice
+    return cast(str, choice)
 
 
 def _text(title: str, *, default: str = "") -> str:
@@ -39,7 +41,24 @@ def _text(title: str, *, default: str = "") -> str:
     ).ask()
     if value is None:
         raise SystemExit(0)
-    return value.strip()
+    return cast(str, value).strip()
+
+
+def prompt_select_clue(clues: list[Clue]) -> Clue | None:
+    """Human-in-the-loop clue picker (used as ``select_clue`` for spymaster bots)."""
+    if not clues:
+        return None
+    choices = [
+        questionary.Choice(
+            title=f"{clue.word} / {clue.count} → {', '.join(clue.intended_targets)}",
+            value=clue,
+        )
+        for clue in clues
+    ]
+    return cast(Clue | None, questionary.select(
+        "Select a clue:",
+        choices=choices,
+    ).ask())
 
 
 def prompt_interactive() -> argparse.Namespace:

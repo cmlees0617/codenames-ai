@@ -33,7 +33,7 @@ class EmbeddingGuessAlgorithm:
             return
 
         visible = self._visible_words(state)
-        self._operative.update_board_state(visible)
+        self._operative.update_board_state(visible)  # type: ignore[no-untyped-call]
         self._pending = list(self._operative.guess(clue.word, clue.count))
         self._clue_key = key
 

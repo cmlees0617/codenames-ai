@@ -1,4 +1,4 @@
-"""CLI entry point for codenames.game bots."""
+"""Thin CLI: parse arguments, collect interactive input, start a cno-bots player."""
 
 from __future__ import annotations
 
@@ -6,19 +6,15 @@ import argparse
 import asyncio
 import logging
 
-from cno.bots.operative import CNOOperativeBot
-from cno.bots.spymaster import AutoCNOSpymasterBot, InteractiveCNOSpymasterBot
-from cno.interactive import prompt_interactive
+from cno_bots.factory import PlayerBuildOptions, build_player
+from cno_bots.runner import ShutdownController, run_player
+from cno_sdk.state import Role, TeamColor
+
+from cno.interactive import prompt_interactive, prompt_select_clue
 from cno.roles import default_nickname, parse_role
-from cno.shutdown import ShutdownController
-from cluegen.algorithms import (
-    CluegenClueAlgorithm,
-    EmbeddingGuessAlgorithm,
-    RandomGuessAlgorithm,
-)
 
 
-def parse_role_arg(role: str):
+def parse_role_arg(role: str) -> tuple[TeamColor, Role]:
     try:
         return parse_role(role)
     except ValueError as exc:
@@ -59,43 +55,6 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _build_player(args: argparse.Namespace, shutdown: asyncio.Event):
-    team, role = args.role
-    nickname = args.nickname or default_nickname(team, role)
-
-    if role == "spymasters":
-        clue_algorithm = CluegenClueAlgorithm()
-        if args.interactive:
-            return InteractiveCNOSpymasterBot(
-                team,
-                clue_algorithm,
-                room=args.room,
-                nickname=nickname,
-                shutdown=shutdown,
-            )
-        return AutoCNOSpymasterBot(
-            team,
-            clue_algorithm,
-            room=args.room,
-            nickname=nickname,
-            shutdown=shutdown,
-        )
-    if role == "operatives":
-        guess_algorithm = (
-            RandomGuessAlgorithm()
-            if args.random_operative
-            else EmbeddingGuessAlgorithm()
-        )
-        return CNOOperativeBot(
-            team,
-            guess_algorithm,
-            room=args.room,
-            nickname=nickname,
-            shutdown=shutdown,
-        )
-    raise ValueError(f"Unsupported role {role}")
-
-
 def _validate_args(args: argparse.Namespace) -> str | None:
     if not args.room:
         return "Provide a room slug from the URL, e.g. halok-jonah"
@@ -111,6 +70,18 @@ def _normalize_args(args: argparse.Namespace) -> None:
     args.room = None
 
 
+def _player_options(args: argparse.Namespace) -> PlayerBuildOptions:
+    team, role = args.role
+    return PlayerBuildOptions(
+        team=team,
+        role=role,
+        room=args.room,
+        nickname=args.nickname or default_nickname(team, role),
+        random_operative=args.random_operative,
+        select_clue=prompt_select_clue if args.interactive else None,
+    )
+
+
 async def _async_main(args: argparse.Namespace) -> int:
     _normalize_args(args)
     error = _validate_args(args)
@@ -118,28 +89,13 @@ async def _async_main(args: argparse.Namespace) -> int:
         logging.error(error)
         return 1
 
-    shutdown = ShutdownController()
     try:
-        player = _build_player(args, shutdown.event)
+        player = build_player(_player_options(args))
     except ValueError as exc:
         logging.error("%s", exc)
         return 1
 
-    run_task = asyncio.create_task(player.play())
-    shutdown.install(
-        asyncio.get_running_loop(),
-        player.close,
-        run_task=run_task,
-    )
-
-    try:
-        await run_task
-        return 0
-    except asyncio.CancelledError:
-        logging.info("Interrupted.")
-        return 130
-    finally:
-        await shutdown.close(player.close)
+    return await run_player(player, shutdown=ShutdownController())
 
 
 def main(argv: list[str] | None = None) -> None:

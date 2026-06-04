@@ -1,6 +1,6 @@
-import pytest
-import numpy as np
 from unittest.mock import patch
+
+import numpy as np
 from cluegen.operative import EmbeddingOperative, LLMOperative
 
 # --- EMBEDDING OPERATIVE TESTS ---

@@ -1,10 +1,10 @@
 # packages/cluegen/src/cluegen/operative.py
 
 from abc import ABC, abstractmethod
+
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-import os
 
 
 class Operative(ABC):
@@ -81,8 +81,9 @@ class LLMOperative(Operative):
     """
     def __init__(self, model_name: str = "Qwen/Qwen2.5-0.5B-Instruct"):
         super().__init__()
-        from transformers import pipeline
         import warnings
+
+        from transformers import pipeline
         warnings.filterwarnings('ignore') # Suppress verbose Hugging Face warnings
         
         print(f"Loading local LLM '{model_name}' (this may take a minute on the first run)...")

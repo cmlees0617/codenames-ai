@@ -1,12 +1,11 @@
 import json
 from pathlib import Path
 
-from cno.views import to_operative_view, to_spymaster_view
+from cno_bots.views import to_operative_view, to_spymaster_view
 from cno_sdk.state import GameState
 
 FIXTURES = (
-    Path(__file__).resolve().parents[3]
-    / "packages"
+    Path(__file__).resolve().parents[2]
     / "cno-sdk"
     / "tests"
     / "fixtures"
@@ -18,7 +17,7 @@ def load_fixture(name: str) -> dict:
         return json.load(handle)
 
 
-def test_spymaster_view_from_fixture():
+def test_spymaster_view_from_fixture() -> None:
     payload = load_fixture("sync_spymaster_turn.json")
     state = GameState.from_bgio(payload["state"])
     view = to_spymaster_view(state, "red")
@@ -31,7 +30,7 @@ def test_spymaster_view_from_fixture():
     assert unrevealed_red == ["PYRAMID", "HEAVEN", "BULB", "CHICK"]
 
 
-def test_operative_view_hides_unrevealed_colors():
+def test_operative_view_hides_unrevealed_colors() -> None:
     payload = load_fixture("sync_spymaster_turn.json")
     state = GameState.from_bgio(payload["state"])
     view = to_operative_view(state, "red")
@@ -41,7 +40,7 @@ def test_operative_view_hides_unrevealed_colors():
             assert tile.color is None
 
 
-def test_operative_view_current_clue_when_active():
+def test_operative_view_current_clue_when_active() -> None:
     payload = load_fixture("sync_spymaster_turn.json")
     state = GameState.from_bgio(payload["state"])
     state.active_team = "red"

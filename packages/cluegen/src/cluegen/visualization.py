@@ -2,14 +2,16 @@
 
 """Utility functions for visualizing word embeddings."""
 
+import warnings
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+
+from cluegen.spymaster import Spymaster
 from cluegen.utils import load_boards_from_json
 
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA
-from cluegen.spymaster import Spymaster
-import warnings
 warnings.filterwarnings('ignore')
 
 def plot_board_and_clue(spymaster: Spymaster, clue: dict):

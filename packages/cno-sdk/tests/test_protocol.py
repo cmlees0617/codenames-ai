@@ -1,12 +1,9 @@
 import json
 from pathlib import Path
 
-import pytest
-
 from cno_sdk.moves import build_give_clue, build_join_team, build_leave_team
 from cno_sdk.protocol import build_make_move
 from cno_sdk.state import GameState, is_spymaster_turn, pick_friendly_words
-
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

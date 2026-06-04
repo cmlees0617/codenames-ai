@@ -6,10 +6,13 @@ Python tools for playing [Codenames Online](https://codenames.game): a protocol 
 
 | Path | Description |
 |------|-------------|
-| `apps/cno` | CLI (`cno` command) and CNO player bots |
+| `apps/cno` | Thin CLI: argparse + interactive prompts only |
+| `packages/cno-bots` | CNO player bots, view adapter, match orchestration |
 | `packages/cno-sdk` | Low-level Socket.IO / boardgame.io client |
 | `packages/cluegen` | `ClueAlgorithm` / `GuessAlgorithm` implementations |
 | `packages/game-core` | Role views, types, and player/algorithm protocols |
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for layer rules and naming.
 
 ## Requirements
 
@@ -140,11 +143,17 @@ Higher penalties reduce false positives at the cost of fewer valid clues.
 uv run python -m cluegen
 ```
 
-## Tests
+## Tests and lint
 
 ```bash
+uv sync --group dev
+
 # Unit tests
 uv run pytest -m "not integration"
+
+# Ruff (Python 3.12 + UP) and mypy (strict on game-core, cno-bots, cno, cluegen.algorithms)
+uv run ruff check apps packages
+uv run mypy -p game_core -p cno_bots -p cno -p cluegen.algorithms
 
 # Live integration tests (network required)
 uv run pytest -m integration

@@ -1,6 +1,5 @@
-import pytest
 
-from cno_sdk.state import GameState, is_operative_turn, is_seated
+from cno_sdk.state import GameState, is_operative_turn
 
 
 def _state(**overrides) -> GameState:

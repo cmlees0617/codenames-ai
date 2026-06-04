@@ -2,14 +2,12 @@ import json
 from pathlib import Path
 
 import pytest
-
-from cno.views import to_spymaster_view
-from cno_sdk.state import GameState
 from cluegen.algorithms import CluegenClueAlgorithm
+from cno_bots.views import to_spymaster_view
+from cno_sdk.state import GameState
 
 FIXTURES = (
-    Path(__file__).resolve().parents[3]
-    / "packages"
+    Path(__file__).resolve().parents[2]
     / "cno-sdk"
     / "tests"
     / "fixtures"
@@ -22,7 +20,7 @@ def load_fixture(name: str) -> dict:
 
 
 @pytest.mark.integration
-def test_cluegen_algorithm_generates_clue_for_fixture_board():
+def test_cluegen_algorithm_generates_clue_for_fixture_board() -> None:
     payload = load_fixture("sync_spymaster_turn.json")
     state = GameState.from_bgio(payload["state"])
     view = to_spymaster_view(state, "red")

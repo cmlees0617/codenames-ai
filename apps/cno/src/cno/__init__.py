@@ -1,1 +1,1 @@
-"""Codenames Online bot CLI and CNO player implementations."""
+"""Codenames Online CLI (argument parsing and interactive prompts)."""

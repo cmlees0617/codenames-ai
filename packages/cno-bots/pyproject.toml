@@ -1,0 +1,18 @@
+[project]
+name = "cno-bots"
+version = "0.1.0"
+description = "Codenames Online player bots and match orchestration"
+requires-python = ">=3.12"
+dependencies = ["cno-sdk", "cluegen", "game-core"]
+
+[tool.uv.sources]
+cno-sdk = { workspace = true }
+cluegen = { workspace = true }
+game-core = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.11.16,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "cno_bots"

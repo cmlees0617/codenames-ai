@@ -1,8 +1,8 @@
-"""Map cno-sdk GameState to game-core role views."""
+"""Map cno-sdk GameState to game-core role views (CNO adapter layer)."""
 
 from __future__ import annotations
 
-from cno_sdk.state import GameState, TeamColor, card_color_to_tile, parse_clues
+from cno_sdk.state import CardColor, GameState, TeamColor, card_color_to_tile, parse_clues
 from game_core.types import TileColor
 from game_core.views import (
     BoardTileView,
@@ -13,8 +13,8 @@ from game_core.views import (
 )
 
 
-def _tile_color(card_color: str) -> TileColor:
-    return card_color_to_tile(card_color)  # type: ignore[return-value]
+def _tile_color(card_color: CardColor) -> TileColor:
+    return card_color_to_tile(card_color)
 
 
 def to_spymaster_view(state: GameState, team: TeamColor) -> SpymasterView:

@@ -1,4 +1,4 @@
-"""Shared helpers for CNO player bots."""
+"""Shared CNO connection and turn-wait helpers."""
 
 from __future__ import annotations
 
@@ -59,7 +59,6 @@ async def wait_spymaster_turn(
     team: TeamColor,
     shutdown: asyncio.Event | None,
 ) -> bool:
-    """Wait for spymaster turn. Returns False if game ended."""
     try:
         state = await client.wait_for_spymaster_turn(team, shutdown=shutdown)
     except GameEnded as exc:

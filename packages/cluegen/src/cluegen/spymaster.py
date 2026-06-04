@@ -1,14 +1,15 @@
 # algos.py
 
-from pathlib import Path
-import pickle
 import itertools
+import pickle
+import ssl
+from pathlib import Path
+
+import nltk
+import numpy as np
+from nltk.stem import SnowballStemmer, WordNetLemmatizer
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-import nltk
-from nltk.stem import SnowballStemmer, WordNetLemmatizer
-import numpy as np
-import ssl
 
 # Download WordNet for lemmatization
 try:
@@ -77,7 +78,7 @@ class Spymaster:
             return
 
         # Compute embeddings if no cache exists
-        with open(filepath, 'r', encoding='utf-8') as file:
+        with open(filepath, encoding='utf-8') as file:
             vocab_list = [line.strip().lower() for line in file if line.strip()]
             for i, word in enumerate(vocab_list):
                 if verbose:

@@ -1,4 +1,4 @@
-"""CNO spymaster player bots."""
+"""CNO spymaster player bot."""
 
 from __future__ import annotations
 
@@ -6,16 +6,19 @@ import asyncio
 import logging
 from collections.abc import Callable
 
-import questionary
-
-from cno.bots import _cno_player as cno
-from cno.views import to_spymaster_view
 from cno_sdk.client import CNOClient
 from cno_sdk.state import TeamColor, friendly_unrevealed
 from game_core.algorithms import ClueAlgorithm
 from game_core.types import Clue
 
+from cno_bots.bots import _cno_player as cno
+from cno_bots.views import to_spymaster_view
+
 logger = logging.getLogger(__name__)
+
+
+def _default_select_clue(clues: list[Clue]) -> Clue | None:
+    return clues[0] if clues else None
 
 
 class CNOSpymasterBot:
@@ -41,7 +44,7 @@ class CNOSpymasterBot:
         self.create_room_if_needed = create_room_if_needed or room is None
         self.shutdown = shutdown
         self.client = client
-        self._select_clue = select_clue or (lambda clues: clues[0] if clues else None)
+        self._select_clue = select_clue or _default_select_clue
         self.rank_limit = rank_limit
 
     async def play(self) -> str:
@@ -82,7 +85,8 @@ class CNOSpymasterBot:
         return self.room
 
     async def _pick_clue(self) -> Clue | None:
-        view = to_spymaster_view(self.client.state, self.team)  # type: ignore[union-attr]
+        assert self.client is not None
+        view = to_spymaster_view(self.client.state, self.team)
         try:
             clues = await asyncio.to_thread(
                 self.clue_algorithm.rank_clues,
@@ -104,44 +108,3 @@ class CNOSpymasterBot:
     async def close(self) -> None:
         if self.client is not None:
             await self.client.leave()
-
-
-class AutoCNOSpymasterBot(CNOSpymasterBot):
-    """Automatically play the top-ranked clue."""
-
-    def __init__(self, team: TeamColor, clue_algorithm: ClueAlgorithm, **kwargs) -> None:
-        super().__init__(
-            team,
-            clue_algorithm,
-            select_clue=lambda clues: clues[0] if clues else None,
-            **kwargs,
-        )
-
-
-class InteractiveCNOSpymasterBot(CNOSpymasterBot):
-    """Let a human pick from the top-ranked clues."""
-
-    def __init__(self, team: TeamColor, clue_algorithm: ClueAlgorithm, **kwargs) -> None:
-        super().__init__(
-            team,
-            clue_algorithm,
-            select_clue=InteractiveCNOSpymasterBot._prompt_select,
-            rank_limit=10,
-            **kwargs,
-        )
-
-    @staticmethod
-    def _prompt_select(clues: list[Clue]) -> Clue | None:
-        if not clues:
-            return None
-        choices = [
-            questionary.Choice(
-                title=f"{clue.word} / {clue.count} → {', '.join(clue.intended_targets)}",
-                value=clue,
-            )
-            for clue in clues
-        ]
-        return questionary.select(
-            "Select a clue:",
-            choices=choices,
-        ).ask()

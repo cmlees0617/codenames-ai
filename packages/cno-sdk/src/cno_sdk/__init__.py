@@ -10,7 +10,7 @@ from cno_sdk.session_log import (
     load_sessions,
     log_session,
 )
-from cno_sdk.state import GameView, GameState
+from cno_sdk.state import GameState, GameView
 
 __all__ = [
     "CNOClient",

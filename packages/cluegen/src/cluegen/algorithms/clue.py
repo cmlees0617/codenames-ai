@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextlib
+from typing import Any
 import io
 import logging
 from pathlib import Path
@@ -26,7 +27,9 @@ def _enemy_team(team: str) -> str:
     return "blue" if team == "red" else "red"
 
 
-def _categories_from_view(state: SpymasterView) -> tuple[list[str], list[str], list[str], list[str]]:
+def _categories_from_view(
+    state: SpymasterView,
+) -> tuple[list[str], list[str], list[str], list[str]]:
     opponent = _enemy_team(state.team)
     targets: list[str] = []
     civilians: list[str] = []
@@ -48,7 +51,7 @@ def _categories_from_view(state: SpymasterView) -> tuple[list[str], list[str], l
     return targets, civilians, enemies, assassins
 
 
-def _result_to_clue(result: dict) -> Clue:
+def _result_to_clue(result: dict[str, Any]) -> Clue:
     targets = tuple(result["intended_targets"])
     return Clue(
         word=result["word"],

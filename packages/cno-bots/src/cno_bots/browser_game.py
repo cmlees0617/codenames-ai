@@ -4,35 +4,42 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 
-from cno.bots.spymaster import AutoCNOSpymasterBot, InteractiveCNOSpymasterBot
+from cluegen.algorithms import CluegenClueAlgorithm
 from cno_sdk.client import CNOClient
 from cno_sdk.room import create_room
-from cluegen.algorithms import CluegenClueAlgorithm
+from game_core.algorithms import ClueAlgorithm
+from game_core.types import Clue
+
+from cno_bots.bots.spymaster import CNOSpymasterBot
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class SpymasterGameHandle:
     room: str
     url: str
     host: CNOClient
-    red_sm: AutoCNOSpymasterBot | InteractiveCNOSpymasterBot
-    blue_sm: AutoCNOSpymasterBot | InteractiveCNOSpymasterBot
+    red_sm: CNOSpymasterBot
+    blue_sm: CNOSpymasterBot
 
 
 async def start_spymaster_game(
     *,
     shutdown: asyncio.Event | None = None,
-    interactive: bool = False,
+    clue_algorithm: ClueAlgorithm | None = None,
+    select_clue_red: Callable[[list[Clue]], Clue | None] | None = None,
+    select_clue_blue: Callable[[list[Clue]], Clue | None] | None = None,
 ) -> SpymasterGameHandle:
     """Create a room, seat two spymaster bots, and start the match."""
     created = await create_room(nickname="GameHost")
     room = created.slug
     host = created.client
     host._log_session = False
+    algorithm = clue_algorithm or CluegenClueAlgorithm()
 
     async def connect(name: str) -> CNOClient:
         client = CNOClient(room_slug=room, nickname=name)
@@ -50,23 +57,23 @@ async def start_spymaster_game(
         await client.request_sync()
         await asyncio.wait_for(client._synced.wait(), timeout=10)
 
-    clue_algorithm = CluegenClueAlgorithm()
-    bot_cls = InteractiveCNOSpymasterBot if interactive else AutoCNOSpymasterBot
-    red_sm = bot_cls(
+    red_sm = CNOSpymasterBot(
         "red",
-        clue_algorithm,
+        algorithm,
         room=room,
         nickname="RedSpymaster",
         shutdown=shutdown,
         client=red_client,
+        select_clue=select_clue_red,
     )
-    blue_sm = bot_cls(
+    blue_sm = CNOSpymasterBot(
         "blue",
-        clue_algorithm,
+        algorithm,
         room=room,
         nickname="BlueSpymaster",
         shutdown=shutdown,
         client=blue_client,
+        select_clue=select_clue_blue,
     )
 
     return SpymasterGameHandle(
@@ -88,6 +95,7 @@ async def run_spymaster_bots(
         asyncio.create_task(handle.red_sm.play()),
         asyncio.create_task(handle.blue_sm.play()),
     ]
+    winner: object | None = None
     try:
         await asyncio.wait_for(asyncio.gather(*tasks), timeout=game_timeout)
     finally:
@@ -95,4 +103,4 @@ async def run_spymaster_bots(
             await bot.close()
         winner = handle.host.state.gameover
         await handle.host.leave()
-        return winner
+    return winner

@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import pytest
-
-from cno.game import run_full_game
+from cno_bots.game import run_full_game
 
 pytestmark = pytest.mark.integration
 
 
 @pytest.mark.asyncio
-async def test_live_full_game_with_four_bots():
+async def test_live_full_game_with_four_bots() -> None:
     result = await run_full_game(game_timeout=180.0)
     assert result.room
     assert result.winner is not None

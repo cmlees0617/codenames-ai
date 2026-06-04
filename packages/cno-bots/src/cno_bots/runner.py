@@ -1,13 +1,18 @@
-"""Shared shutdown handling for async bot sessions."""
+"""Run a player bot until disconnect or interrupt."""
 
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import signal
 from collections.abc import Awaitable, Callable
 
+from game_core.players import OperativePlayer, SpymasterPlayer
+
 logger = logging.getLogger(__name__)
+
+type CNOPlayer = SpymasterPlayer | OperativePlayer
 
 
 class ShutdownController:
@@ -42,7 +47,30 @@ class ShutdownController:
             asyncio.create_task(handle())
 
         for sig in (signal.SIGTERM, signal.SIGINT):
-            try:
+            with contextlib.suppress(NotImplementedError, RuntimeError):
                 loop.add_signal_handler(sig, trigger)
-            except (NotImplementedError, RuntimeError):
-                pass
+
+
+async def run_player(
+    player: CNOPlayer,
+    *,
+    shutdown: ShutdownController | None = None,
+) -> int:
+    """Run ``player.play()`` with optional graceful shutdown. Returns exit code."""
+    controller = shutdown or ShutdownController()
+    run_task = asyncio.create_task(player.play())
+    closer = player.close
+    controller.install(
+        asyncio.get_running_loop(),
+        closer,
+        run_task=run_task,
+    )
+
+    try:
+        await run_task
+        return 0
+    except asyncio.CancelledError:
+        logger.info("Interrupted.")
+        return 130
+    finally:
+        await controller.close(closer)

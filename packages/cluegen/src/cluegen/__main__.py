@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cluegen.spymaster import Spymaster
 from cluegen.operative import EmbeddingOperative, LLMOperative
+from cluegen.spymaster import Spymaster
 from cluegen.utils import load_boards_from_json
 
 

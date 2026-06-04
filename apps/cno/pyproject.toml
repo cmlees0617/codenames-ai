@@ -1,22 +1,15 @@
 [project]
 name = "cno"
 version = "0.1.0"
-description = "CLI and high-level bot client for codenames.game spymasters"
+description = "CLI entrypoint for codenames.game bots"
 requires-python = ">=3.12"
-dependencies = [
-    "cno-sdk",
-    "cluegen",
-    "game-core",
-    "questionary>=2.0.0",
-]
+dependencies = ["cno-bots", "questionary>=2.0.0"]
 
 [project.scripts]
 cno = "cno.cli:main"
 
 [tool.uv.sources]
-cno-sdk = { workspace = true }
-cluegen = { workspace = true }
-game-core = { workspace = true }
+cno-bots = { workspace = true }
 
 [build-system]
 requires = ["uv_build>=0.11.16,<0.12"]
