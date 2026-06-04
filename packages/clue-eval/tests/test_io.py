@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 
 import pytest
-
 from clue_eval.boards.io import load_boards_from_json
 from clue_eval.paths import default_test_boards_path
 

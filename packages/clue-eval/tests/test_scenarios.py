@@ -1,8 +1,7 @@
-from game_core.types import Clue
-
 from clue_eval.demos.stub_algorithm import StubClueAlgorithm
 from clue_eval.scenarios.runner import ScenarioRunner
 from clue_eval.scenarios.types import Scenario
+from game_core.types import Clue
 
 
 def _minimal_board() -> dict:

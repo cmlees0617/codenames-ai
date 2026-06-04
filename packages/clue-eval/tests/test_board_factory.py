@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 from clue_eval.boards.factory import BoardFactory
 
 
