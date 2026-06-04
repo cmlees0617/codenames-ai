@@ -1,4 +1,8 @@
-"""Map cno-sdk GameState to game-core role views (CNO adapter layer)."""
+"""Map cno-sdk ``GameState`` to game-core role views (CNO adapter layer).
+
+``TeamColor`` / ``Role`` literals match ``game_core.types`` and ``cno_sdk.state``.
+Mypy treats them as distinct types; at runtime they are the same strings.
+"""
 
 from __future__ import annotations
 

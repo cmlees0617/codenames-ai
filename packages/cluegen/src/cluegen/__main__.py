@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cluegen.operative import EmbeddingOperative, LLMOperative
-from cluegen.spymaster import Spymaster
+from cluegen.clue_engine import ClueEngine
+from cluegen.guess_engine import EmbeddingGuessEngine, LLMGuessEngine
 from cluegen.utils import load_boards_from_json
 
 
 def main() -> None:
     data_dir = Path(__file__).resolve().parents[2] / "data"
-    spymaster = Spymaster()
-    spymaster.load_vocabulary(str(data_dir / "simple_vocab.txt"), verbose=True)
+    engine = ClueEngine()
+    engine.load_vocabulary(str(data_dir / "simple_vocab.txt"), verbose=True)
 
     boards = load_boards_from_json(data_dir / "test_boards.json")
     board = boards[0]
@@ -22,28 +22,32 @@ def main() -> None:
     enemies = board["reds"]
     assassins = board["assassins"]
 
-    spymaster.initialize_game_board(targets + civilians + enemies + assassins)
-    spymaster.update_board_state(
+    engine.initialize_game_board(targets + civilians + enemies + assassins)
+    engine.update_board_state(
         targets=targets,
         civilians=civilians,
         enemies=enemies,
         assassins=assassins,
     )
-    spymaster.prune_vocabulary()
-    clue = spymaster.generate_clue(min_targets=1, max_targets=3, verbose=True)
+    engine.prune_vocabulary()
+    clue = engine.generate_clue(min_targets=1, max_targets=3, verbose=True)
     print(clue)
 
+    embedding_guesser = EmbeddingGuessEngine()
+    embedding_guesser.update_board_state(targets + civilians + enemies + assassins)
+    embedding_guesses = embedding_guesser.guess(
+        clue=clue["word"],
+        count=len(clue["intended_targets"]),
+    )
+    print(f"Embedding guesses: {embedding_guesses}")
 
-    # Try to guess words based on the clue
-    embedding_operative = EmbeddingOperative()
-    embedding_operative.update_board_state(targets + civilians + enemies + assassins)
-    embedding_guesses = embedding_operative.guess(clue=clue["word"], count=len(clue["intended_targets"]))
-    print(f"Embedding Operative Guesses: {embedding_guesses}")
-
-    llm_operative = LLMOperative()
-    llm_operative.update_board_state(targets + civilians + enemies + assassins)
-    llm_guesses = llm_operative.guess(clue=clue["word"], count=len(clue["intended_targets"]))
-    print(f"LLM Operative Guesses: {llm_guesses}")
+    llm_guesser = LLMGuessEngine()
+    llm_guesser.update_board_state(targets + civilians + enemies + assassins)
+    llm_guesses = llm_guesser.guess(
+        clue=clue["word"],
+        count=len(clue["intended_targets"]),
+    )
+    print(f"LLM guesses: {llm_guesses}")
 
 
 if __name__ == "__main__":

@@ -7,10 +7,8 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-class Operative(ABC):
-    """
-    Abstract base class for a Codenames operative.
-    """
+class GuessEngine(ABC):
+    """Internal batch-guess engine (used by ``EmbeddingGuessAlgorithm``)."""
     def __init__(self):
         self.visible_words: list[str] = []
 
@@ -35,7 +33,7 @@ class Operative(ABC):
         pass
 
 
-class EmbeddingOperative(Operative):
+class EmbeddingGuessEngine(GuessEngine):
     """
     Uses local vector embeddings to find the closest words to the clue.
     """
@@ -74,7 +72,7 @@ class EmbeddingOperative(Operative):
         return [self.visible_words[i] for i in top_indices]
     
 
-class LLMOperative(Operative):
+class LLMGuessEngine(GuessEngine):
     """
     Uses a small, local open-source LLM to reason about the board 
     without needing any API keys.

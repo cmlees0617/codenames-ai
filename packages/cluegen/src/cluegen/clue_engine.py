@@ -22,7 +22,7 @@ else:
 nltk.download('wordnet', quiet=True)
 
 
-class Spymaster:
+class ClueEngine:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         """
         Download selected model and initialize state variables.

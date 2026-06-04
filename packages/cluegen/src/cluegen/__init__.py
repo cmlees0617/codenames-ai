@@ -1,5 +1,11 @@
-"""Offline Codenames spymaster clue generation."""
+"""Offline Codenames clue and guess engines."""
 
-from cluegen.spymaster import Spymaster
+from cluegen.clue_engine import ClueEngine
+from cluegen.guess_engine import EmbeddingGuessEngine, GuessEngine, LLMGuessEngine
 
-__all__ = ["Spymaster"]
+__all__ = [
+    "ClueEngine",
+    "EmbeddingGuessEngine",
+    "GuessEngine",
+    "LLMGuessEngine",
+]

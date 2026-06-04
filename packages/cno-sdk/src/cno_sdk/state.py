@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+# Keep in sync with game_core.types (same literals; SDK does not depend on game-core).
 TeamColor = Literal["red", "blue"]
 Role = Literal["operatives", "spymasters"]
 CardColor = Literal["red", "blue", "neutral", "black"]

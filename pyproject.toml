@@ -31,8 +31,8 @@ target-version = "py312"
 line-length = 100
 src = ["apps", "packages"]
 extend-exclude = [
-    "packages/cluegen/src/cluegen/spymaster.py",
-    "packages/cluegen/src/cluegen/operative.py",
+    "packages/cluegen/src/cluegen/clue_engine.py",
+    "packages/cluegen/src/cluegen/guess_engine.py",
     "packages/cluegen/src/cluegen/generate_vocab.py",
     "packages/cluegen/src/cluegen/visualization.py",
     "packages/cluegen/src/cluegen/utils.py",

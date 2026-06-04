@@ -7,12 +7,12 @@ Python tools for playing [Codenames Online](https://codenames.game): a protocol 
 | Path | Description |
 |------|-------------|
 | `apps/cno` | Thin CLI: argparse + interactive prompts only |
-| `packages/cno-bots` | CNO player bots, view adapter, match orchestration |
+| `packages/cno-bots` | CNO player bots, view adapter, match orchestration ([docs](docs/implementations/cno-bots.md)) |
 | `packages/cno-sdk` | Low-level Socket.IO / boardgame.io client |
 | `packages/cluegen` | `ClueAlgorithm` / `GuessAlgorithm` implementations |
 | `packages/game-core` | Role views, types, and player/algorithm protocols |
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for layer rules and naming.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for layer rules and [docs/README.md](docs/README.md) for interface and implementation reference.
 
 ## Requirements
 
@@ -83,38 +83,30 @@ This creates three vocabulary files in `packages/cluegen/data/`:
 
 Vocabularies are cached as pickle files after first use, storing pre-computed embeddings for the selected model.
 
-### Using the Spymaster Class
+### Using ClueEngine (offline)
 
-The `Spymaster` class generates clues by analyzing semantic relationships between board words and vocabulary candidates.
+The internal `ClueEngine` class searches vocabulary for clues. Live play uses `CluegenClueAlgorithm` via `cno-bots` (see [docs](docs/README.md)).
 
 #### Basic Workflow
 
 ```python
-from cluegen import Spymaster
+from cluegen import ClueEngine
 
-# Initialize with an embedding model (defaults to "all-MiniLM-L6-v2")
-spymaster = Spymaster(model_name="all-MiniLM-L6-v2")
+engine = ClueEngine(model_name="all-MiniLM-L6-v2")
+engine.load_vocabulary("packages/cluegen/data/standard_vocab.txt")
 
-# Load a vocabulary (will cache embeddings automatically)
-spymaster.load_vocabulary("packages/cluegen/data/standard_vocab.txt")
-
-# Set up the board with all 25 words
 all_words = ["APPLE", "BANANA", "CARROT", ...]  # 25 words
-spymaster.initialize_game_board(all_words)
+engine.initialize_game_board(all_words)
 
-# Update the board state at the start of each turn
-spymaster.update_board_state(
-    targets=["APPLE", "BANANA"],     # Words your team needs to guess
-    civilians=["CARROT", "POTATO"],   # Neutral words
-    enemies=["ORANGE", "GRAPE"],      # Opponent's words
-    assassins=["POISON"]              # Lose instantly if guessed
+engine.update_board_state(
+    targets=["APPLE", "BANANA"],
+    civilians=["CARROT", "POTATO"],
+    enemies=["ORANGE", "GRAPE"],
+    assassins=["POISON"],
 )
 
-# Prune vocabulary to safe, relevant words (optional but recommended)
-spymaster.prune_vocabulary(danger_threshold=0.25, relevance_threshold=0.1)
-
-# Generate a clue covering 1-3 targets
-clue = spymaster.generate_clue(min_targets=1, max_targets=3)
+engine.prune_vocabulary(danger_threshold=0.25, relevance_threshold=0.1)
+clue = engine.generate_clue(min_targets=1, max_targets=3)
 print(f"Clue: {clue['word']} covering {clue['intended_targets']}")
 ```
 

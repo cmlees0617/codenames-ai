@@ -1,12 +1,12 @@
 from unittest.mock import patch
 
 import numpy as np
-from cluegen.operative import EmbeddingOperative, LLMOperative
+from cluegen.guess_engine import EmbeddingGuessEngine, LLMGuessEngine
 
 # --- EMBEDDING OPERATIVE TESTS ---
 
-@patch("cluegen.operative.SentenceTransformer")
-def test_embedding_operative_guess(MockTransformer):
+@patch("cluegen.guess_engine.SentenceTransformer")
+def test_embedding_guess_engine(MockTransformer):
     """
     Tests that the EmbeddingOperative correctly uses cosine similarity 
     to find the closest words to the clue.
@@ -26,7 +26,7 @@ def test_embedding_operative_guess(MockTransformer):
     # Tell our fake model to return the vectors from our map
     mock_model.encode.side_effect = lambda word: vector_map.get(word.upper(), np.array([0.0, 0.0, 1.0]))
 
-    op = EmbeddingOperative(model_name="dummy-model")
+    op = EmbeddingGuessEngine(model_name="dummy-model")
     
     # 1. Test updating board state correctly caches the words
     op.update_board_state(["APPLE", "BANANA", "CAR"])
@@ -46,8 +46,8 @@ def test_embedding_operative_guess(MockTransformer):
 
 def test_embedding_operative_empty_state():
     """Tests the operative fails gracefully if the board is empty."""
-    with patch("cluegen.operative.SentenceTransformer"):
-        op = EmbeddingOperative()
+    with patch("cluegen.guess_engine.SentenceTransformer"):
+        op = EmbeddingGuessEngine()
         assert op.guess("CLUE", 2) == []
 
 
@@ -62,7 +62,7 @@ def test_local_llm_operative_parsing(mock_pipeline):
     # Setup our fake Hugging Face pipeline
     mock_generator = mock_pipeline.return_value
     
-    op = LLMOperative(model_name="dummy-model")
+    op = LLMGuessEngine(model_name="dummy-model")
     op.update_board_state(["APPLE", "BANANA", "CAR", "DOG"])
 
     # --- Scenario 1: Perfect Output ---
