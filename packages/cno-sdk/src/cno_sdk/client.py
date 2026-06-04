@@ -5,7 +5,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 from urllib.parse import urlparse
 
 import socketio
@@ -492,7 +493,7 @@ class CNOClient:
                     self._state_changed.wait(),
                     timeout=min(poll_interval, remaining),
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 continue
         raise TimeoutError(timeout_message)
 
@@ -580,7 +581,7 @@ class CNOClient:
                     self._match_data_changed.wait(),
                     timeout=max(0.1, deadline - time.monotonic()),
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 await self.request_sync()
         logger.warning(
             "Timed out waiting for player %s to leave match %s",
@@ -627,7 +628,7 @@ class CNOClient:
                 try:
                     await self._send_move(action, timeout=30.0)
                     break
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     if attempt == 0:
                         logger.warning("startMatch move timed out; resyncing and retrying")
                         await self._ensure_synced()
@@ -723,7 +724,7 @@ class CNOClient:
                 if shutdown is not None:
                     wait_timeout = min(poll_interval, 0.25)
                 await asyncio.wait_for(self._state_changed.wait(), timeout=wait_timeout)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 if shutdown is not None and shutdown.is_set():
                     raise asyncio.CancelledError("Shutdown requested")
                 if time.monotonic() >= next_sync:

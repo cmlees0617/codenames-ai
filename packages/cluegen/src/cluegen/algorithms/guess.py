@@ -7,14 +7,14 @@ import random
 from game_core.types import GuessAction
 from game_core.views import OperativeView
 
-from cluegen.operative import EmbeddingOperative
+from cluegen.guess_engine import EmbeddingGuessEngine
 
 
 class EmbeddingGuessAlgorithm:
     """Guess one word at a time using embedding similarity to the current clue."""
 
     def __init__(self, model_name: str = "all-MiniLM-L6-v2") -> None:
-        self._operative = EmbeddingOperative(model_name=model_name)
+        self._engine = EmbeddingGuessEngine(model_name=model_name)
         self._pending: list[str] = []
         self._clue_key: tuple[str, int] | None = None
 
@@ -33,8 +33,8 @@ class EmbeddingGuessAlgorithm:
             return
 
         visible = self._visible_words(state)
-        self._operative.update_board_state(visible)
-        self._pending = list(self._operative.guess(clue.word, clue.count))
+        self._engine.update_board_state(visible)  # type: ignore[no-untyped-call]
+        self._pending = list(self._engine.guess(clue.word, clue.count))
         self._clue_key = key
 
     def guess_word(self, state: OperativeView) -> GuessAction:

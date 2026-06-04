@@ -1,12 +1,13 @@
 # src/generate_vocab.py
 # FIXME: Eliminate stop words
 
-import wordfreq
-from pathlib import Path
-import nltk
-from nltk.corpus import stopwords
-import unicodedata
 import ssl
+import unicodedata
+from pathlib import Path
+
+import nltk
+import wordfreq
+from nltk.corpus import stopwords
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context

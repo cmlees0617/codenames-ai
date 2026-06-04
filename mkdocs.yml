@@ -1,0 +1,109 @@
+site_name: codenames-ai
+site_description: Contributor documentation for the codenames-ai monorepo
+site_url: https://cmlees0617.github.io/codenames-ai/
+repo_url: https://github.com/cmlees0617/codenames-ai
+repo_name: cmlees0617/codenames-ai
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - packages/game-core/src
+            - packages/cluegen/src
+            - packages/cno-bots/src
+            - apps/cno/src
+          options:
+            docstring_style: google
+            show_source: true
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+            filters:
+              - "!^_"
+  - mermaid2
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Architecture:
+      - Overview: architecture/overview.md
+      - Packages & boundaries: architecture/packages.md
+      - Execution flow: architecture/execution-flow.md
+  - Interfaces:
+      - Types & views: interfaces/types-and-views.md
+      - ClueAlgorithm: interfaces/clue-algorithm.md
+      - GuessAlgorithm: interfaces/guess-algorithm.md
+      - SpymasterPlayer: interfaces/spymaster-player.md
+      - OperativePlayer: interfaces/operative-player.md
+      - GameBackend (planned): interfaces/game-backend.md
+  - Implementations:
+      - game-core: implementations/game-core.md
+      - cluegen: implementations/cluegen.md
+      - cno-sdk: implementations/cno-sdk.md
+      - cno-bots: implementations/cno-bots.md
+      - CLI (apps/cno): implementations/cno-cli.md
+  - CLI reference: cli/reference.md
+  - Contributor guides:
+      - Overview: contributor-guides/index.md
+      - Add a clue algorithm: contributor-guides/adding-clue-algorithm.md
+      - Add a guess algorithm: contributor-guides/adding-guess-algorithm.md
+      - Add a game backend: contributor-guides/adding-game-backend.md
+      - Extend the CLI: contributor-guides/extending-cli.md
+      - Testing & quality: contributor-guides/testing.md
+  - API reference (selected):
+      - Overview: api/index.md
+      - game_core protocols: api/game-core.md
+      - cluegen algorithms: api/cluegen.md
+      - cno_bots factory: api/cno-bots.md
+  - ADRs:
+      - Index: adrs/index.md
+      - ADR-0001 Layered monorepo: adrs/0001-layered-monorepo.md
+      - ADR-0002 Thin CLI and cno-bots: adrs/0002-thin-cli-and-cno-bots.md
+      - ADR-0003 Duplicate wire/domain literals: adrs/0003-wire-domain-literals.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/cmlees0617/codenames-ai

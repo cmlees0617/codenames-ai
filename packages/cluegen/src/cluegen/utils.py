@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+
 def load_boards_from_json(filename: Path) -> list[dict]:
     """
     Loads all boards from the given JSON file and returns them as a list of dictionaries.

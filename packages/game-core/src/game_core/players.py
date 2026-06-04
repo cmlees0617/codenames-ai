@@ -2,14 +2,26 @@
 
 from __future__ import annotations
 
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 
+@runtime_checkable
 class SpymasterPlayer(Protocol):
-    async def play(self) -> str | None:
-        """Connect, join, and play spymaster turns until game over. Returns room slug."""
+    """Runs the spymaster role until the game ends."""
+
+    async def play(self) -> str:
+        """Connect, join, give clues each turn. Returns the room slug."""
+
+    async def close(self) -> None:
+        """Leave the room and release resources."""
 
 
+@runtime_checkable
 class OperativePlayer(Protocol):
-    async def play(self) -> str | None:
-        """Connect, join, and play operative turns until game over. Returns room slug."""
+    """Runs the operative role until the game ends."""
+
+    async def play(self) -> str:
+        """Connect, join, guess each operative phase. Returns the room slug."""
+
+    async def close(self) -> None:
+        """Leave the room and release resources."""

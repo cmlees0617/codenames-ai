@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from cno_sdk.client import CNOClient
 from cno_sdk.room import create_room
 from cno_sdk.state import is_seated

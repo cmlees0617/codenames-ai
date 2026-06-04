@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import AsyncIterator
 
 import pytest
-
 from cno_sdk.client import CNOClient
 from cno_sdk.room import CreatedRoom, create_room
 

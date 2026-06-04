@@ -1,4 +1,9 @@
-"""Neutral domain types for Codenames."""
+"""Neutral domain types for Codenames.
+
+``TeamColor`` and ``Role`` mirror the literals in ``cno_sdk.state`` so the SDK
+stays independent of ``game-core``. Keep them in sync; ``cno_bots.views`` maps
+wire state into domain views.
+"""
 
 from __future__ import annotations
 
@@ -6,6 +11,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 TeamColor = Literal["red", "blue"]
+Role = Literal["spymasters", "operatives"]
 TileColor = Literal["red", "blue", "civilian", "assassin"]
 
 

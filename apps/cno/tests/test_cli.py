@@ -1,7 +1,6 @@
 import argparse
 
 import pytest
-
 from cno.cli import _normalize_args, build_parser
 from cno.interactive import prompt_interactive
 from cno.roles import default_nickname, parse_role

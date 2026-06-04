@@ -2,57 +2,53 @@
 
 """Utility functions for visualizing word embeddings."""
 
+import warnings
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+
+from cluegen.clue_engine import ClueEngine
 from cluegen.utils import load_boards_from_json
 
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA
-from cluegen.spymaster import Spymaster
-import warnings
 warnings.filterwarnings('ignore')
 
-def plot_board_and_clue(spymaster: Spymaster, clue: dict):
-    """
-    Takes an initialized Spymatster and its best clue and plots the vectors.
-
-    Parameters:
-        spymaster: An initialized Spymaster with a loaded vocabulary.
-        clue: A dictionary containing the clue word and its associated target words.
-    """
+def plot_board_and_clue(engine: ClueEngine, clue: dict) -> None:
+    """Plot embedding space for board words and a generated clue."""
     labels = []
     vectors = []
     colors = []
-    visible_words = spymaster.visible_strings
+    visible_words = engine.visible_strings
 
     # Inside plot_board_and_clue in visualize.py...
     for word in visible_words:
-        vec = spymaster.master_board_cache[word]
+        vec = engine.master_board_cache[word]
         labels.append(word)
         vectors.append(vec)
         
         # Color code based on what type of card it is using the spymaster's string lists
-        if word in spymaster.target_strings:
+        if word in engine.target_strings:
             colors.append("green")
-        elif word in spymaster.assassin_strings:
+        elif word in engine.assassin_strings:
             colors.append("black")
-        elif word in spymaster.enemy_strings:
+        elif word in engine.enemy_strings:
             colors.append("red")
         else:
             colors.append("gray")
 
     # Add the clue and its intended targets
     labels.append(f"CLUE: {clue['word']}")
-    vectors.append(spymaster.vocabulary[clue['word'].lower()])
+    vectors.append(engine.vocabulary[clue['word'].lower()])
     colors.append("blue")
 
     # Add a random sample of background vocabulary to see the noise
     import random
-    vocab_sample = random.sample(list(spymaster.vocabulary.keys()), 50)
+    vocab_sample = random.sample(list(engine.vocabulary.keys()), 50)
     for word in vocab_sample:
         if word.upper() not in visible_words and word.upper() != clue['word'].upper():
             labels.append(word.upper())
-            vectors.append(spymaster.vocabulary[word])
+            vectors.append(engine.vocabulary[word])
             colors.append("lightgray")
 
     # Dimensionality reduction using t-SNE (pre-filtered using PCA for stability)
@@ -89,7 +85,7 @@ def plot_board_and_clue(spymaster: Spymaster, clue: dict):
 
 if __name__ == "__main__":
     # Setup test environment
-    bot = Spymaster()
+    bot = ClueEngine()
     
     # Use your existing data folder setup
     from pathlib import Path

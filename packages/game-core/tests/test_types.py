@@ -1,5 +1,4 @@
 import pytest
-
 from game_core.types import Clue, GuessAction
 
 

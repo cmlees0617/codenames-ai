@@ -7,7 +7,6 @@ from cno_sdk.state import (
     parse_guesses,
 )
 
-
 FIXTURES = Path(__file__).parent / "fixtures"
 
 

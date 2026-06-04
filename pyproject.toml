@@ -7,10 +7,22 @@ requires-python = ">=3.12"
 members = ["apps/*", "packages/*"]
 
 [dependency-groups]
-dev = ["pytest", "pytest-asyncio", "ruff", "cno"]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+    "mypy",
+    "cno",
+    "cno-bots",
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.27",
+    "mkdocs-mermaid2-plugin>=1.2",
+]
 
 [tool.uv.sources]
 cno = { workspace = true }
+cno-bots = { workspace = true }
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -18,8 +30,69 @@ testpaths = [
     "packages/game-core/tests",
     "packages/cno-sdk/tests",
     "packages/cluegen/tests",
+    "packages/cno-bots/tests",
     "apps/cno/tests",
 ]
 markers = [
     "integration: live tests that require network access to codenames.game",
 ]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["apps", "packages"]
+extend-exclude = [
+    "packages/cluegen/src/cluegen/clue_engine.py",
+    "packages/cluegen/src/cluegen/guess_engine.py",
+    "packages/cluegen/src/cluegen/generate_vocab.py",
+    "packages/cluegen/src/cluegen/visualization.py",
+    "packages/cluegen/src/cluegen/utils.py",
+    "packages/cluegen/src/cluegen/__main__.py",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"packages/cno-sdk/**" = ["B904", "SIM105", "SIM117"]
+"packages/cluegen/src/cluegen/spymaster.py" = ["B007", "SIM"]
+"packages/cluegen/src/cluegen/operative.py" = ["SIM"]
+"packages/cluegen/src/cluegen/generate_vocab.py" = ["SIM"]
+"packages/cluegen/tests/**" = ["E712", "E501"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = [
+    "packages/game-core/src",
+    "packages/cno-sdk/src",
+    "packages/cluegen/src",
+    "packages/cno-bots/src",
+    "apps/cno/src",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "game_core.*",
+    "cno_bots.*",
+    "cno.cli",
+    "cno.interactive",
+    "cno.roles",
+    "cluegen.algorithms.*",
+]
+strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "sentence_transformers.*",
+    "transformers.*",
+    "sklearn.*",
+    "nltk.*",
+    "wordfreq.*",
+    "socketio.*",
+    "questionary.*",
+    "matplotlib.*",
+]
+ignore_missing_imports = true

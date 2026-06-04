@@ -1,8 +1,12 @@
-from game_core.views import SpymasterBoardCard, SpymasterView
-
 from cluegen.algorithms.scripted import ScriptedClueAlgorithm, ScriptedGuessAlgorithm
 from game_core.types import GuessAction
-from game_core.views import BoardTileView, ClueHistoryEntry, OperativeView
+from game_core.views import (
+    BoardTileView,
+    ClueHistoryEntry,
+    OperativeView,
+    SpymasterBoardCard,
+    SpymasterView,
+)
 
 
 def test_scripted_clue_algorithm():

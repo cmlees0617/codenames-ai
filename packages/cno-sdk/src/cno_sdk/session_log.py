@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -38,7 +38,7 @@ class PlayerSession:
             nickname=client.nickname,
             host=client.host,
             socket_path=client.socket_path,
-            logged_at=datetime.now(timezone.utc).isoformat(),
+            logged_at=datetime.now(UTC).isoformat(),
         )
 
     @classmethod

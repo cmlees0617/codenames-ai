@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import random
-import string
-
 
 _SYLLABLES = (
     "ba", "be", "bi", "bo", "bu", "ca", "ce", "ci", "co", "cu",

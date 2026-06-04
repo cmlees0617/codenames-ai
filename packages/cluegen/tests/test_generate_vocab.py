@@ -1,6 +1,7 @@
-import pytest
 from unittest.mock import patch
+
 from cluegen.generate_vocab import generate_vocab
+
 
 @patch("cluegen.generate_vocab.wordfreq")
 def test_generate_vocab_filtering_and_accents(mock_wordfreq):
