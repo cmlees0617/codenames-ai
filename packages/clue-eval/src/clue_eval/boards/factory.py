@@ -40,3 +40,29 @@ class BoardFactory:
             "civilians": shuffled[17:24],
             "assassins": [shuffled[24]],
         }
+
+    @staticmethod
+    def create_clue_set(
+        targets: list[str],
+        pool: list[str],
+        *,
+        civilian_count: int = 5,
+        enemy_count: int = 5,
+    ) -> BoardLayout:
+        """Build a board around a known target cluster (debugging / catalog cases)."""
+        remaining = [word for word in pool if word not in targets]
+        needed = civilian_count + enemy_count + 1
+        if len(remaining) < needed:
+            raise ValueError("Word pool too small for requested board constraints.")
+
+        random.shuffle(remaining)
+        civs = remaining[:civilian_count]
+        enemies = remaining[civilian_count : civilian_count + enemy_count]
+        assassin_start = civilian_count + enemy_count
+
+        return {
+            "blues": list(targets),
+            "civilians": civs,
+            "reds": enemies,
+            "assassins": remaining[assassin_start : assassin_start + 1],
+        }
