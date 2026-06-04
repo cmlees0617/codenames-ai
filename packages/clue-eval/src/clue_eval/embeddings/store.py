@@ -7,15 +7,11 @@ from pathlib import Path
 
 import numpy as np
 
-from clue_eval.paths import package_data_dir
+from clue_eval.paths import default_embeddings_path
 
 MODEL_NAME = "glove-wiki-gigaword-300"
 VECTOR_SIZE = 300
 DEFAULT_FILENAME = "glove-wiki-gigaword-300.npz"
-
-
-def default_embeddings_path() -> Path:
-    return package_data_dir() / DEFAULT_FILENAME
 
 
 def load_words_from_file(path: Path) -> list[str]:

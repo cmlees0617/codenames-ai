@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "game-core",
     "numpy",
+    "tqdm",
 ]
 
 [project.optional-dependencies]

@@ -5,7 +5,10 @@ from __future__ import annotations
 import random
 from pathlib import Path
 
+from tqdm import tqdm
+
 from clue_eval.boards.difficulty import DEFAULT_BETA, BoardDifficulty, board_difficulty
+from clue_eval.boards.io import save_boards_to_json
 from clue_eval.boards.types import BoardLayout, FixtureBoard
 from clue_eval.embeddings.store import EmbeddingStore
 
@@ -136,14 +139,18 @@ class BoardFactory:
         beta: float = DEFAULT_BETA,
         candidate_multiplier: int = 100,
         seed: int | None = None,
+        show_progress: bool = False,
     ) -> list[FixtureBoard]:
         """
         Generate ``n`` boards with uniformly spaced mean difficulty.
 
-        Difficulty per team (``beta`` defaults to 2.0)::
+        Difficulty per team in ``[0, 1]`` (``beta`` defaults to 2.0; higher = harder)::
 
-            avg_sim(targets, targets)
-            / (avg_sim(targets, others) + beta * max_sim(targets, assassin))
+            confusion / (confusion + cohesion)
+
+        using ``log(1 + cos) / log(2)`` on non-negative pairs (negatives omitted).
+        Boards with no scorable target–target pairs for a team are skipped. Confusion =
+        + beta * log-max assassin; cohesion = log-mean pairwise among targets.
 
         Process:
         1. Sample ``n * candidate_multiplier`` unique random 25-card layouts.
@@ -167,14 +174,24 @@ class BoardFactory:
 
         attempts = 0
         max_attempts = candidate_count * 20
-        while len(scored) < candidate_count and attempts < max_attempts:
-            attempts += 1
-            layout = BoardFactory.create_random_game(pool, rng=rng)
-            key = _layout_word_key(layout)
-            if key in seen:
-                continue
-            seen.add(key)
-            scored.append((layout, board_difficulty(layout, embeddings, beta=beta)))
+        with tqdm(
+            total=candidate_count,
+            desc="Scoring candidate boards",
+            unit="board",
+            disable=not show_progress,
+        ) as progress:
+            while len(scored) < candidate_count and attempts < max_attempts:
+                attempts += 1
+                layout = BoardFactory.create_random_game(pool, rng=rng)
+                key = _layout_word_key(layout)
+                if key in seen:
+                    continue
+                difficulty = board_difficulty(layout, embeddings, beta=beta)
+                if difficulty is None:
+                    continue
+                seen.add(key)
+                scored.append((layout, difficulty))
+                progress.update(1)
 
         if len(scored) < n:
             raise ValueError(
@@ -187,3 +204,32 @@ class BoardFactory:
             _to_fixture_board(layout, difficulty, board_id=index + 1)
             for index, (layout, difficulty) in enumerate(selected)
         ]
+
+    @staticmethod
+    def generate_and_save_uniform_difficulty_boards(
+        n: int,
+        embeddings: EmbeddingStore,
+        output_path: Path,
+        word_pool: list[str] | None = None,
+        *,
+        beta: float = DEFAULT_BETA,
+        candidate_multiplier: int = 100,
+        seed: int | None = None,
+        sort_by_difficulty: bool = True,
+        show_progress: bool = False,
+    ) -> Path:
+        """
+        Generate boards, then save to ``output_path`` ordered easiest → hardest.
+
+        See :meth:`generate_uniform_difficulty_boards` for generation parameters.
+        """
+        boards = BoardFactory.generate_uniform_difficulty_boards(
+            n,
+            embeddings,
+            word_pool,
+            beta=beta,
+            candidate_multiplier=candidate_multiplier,
+            seed=seed,
+            show_progress=show_progress,
+        )
+        return save_boards_to_json(output_path, boards, sort_by_difficulty=sort_by_difficulty)
