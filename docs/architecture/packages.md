@@ -5,7 +5,8 @@
 | Package | Path | Responsibility |
 |---------|------|----------------|
 | `game-core` | `packages/game-core` | Domain types, role views, `Protocol`s |
-| `cluegen` | `packages/cluegen` | Algorithm implementations + `ClueEngine` / `GuessEngine` ML |
+| `clue-eval` | `packages/clue-eval` | Predefined clue tests + model-agnostic harness |
+| `cluegen` | `packages/cluegen` | Optional example embedding algorithms (not required by eval) |
 | `cno-sdk` | `packages/cno-sdk` | codenames.game Socket.IO client, `GameState` parsing |
 | `cno-bots` | `packages/cno-bots` | View adapter, `CNOSpymasterBot`, `CNOOperativeBot`, `run_full_game` |
 | `cno` | `apps/cno` | `cno` console script — prompts and argparse only |
@@ -22,13 +23,21 @@ Root `pyproject.toml` defines the uv workspace (`apps/*`, `packages/*`) and shar
 
 **Does not contain:** HTTP, sockets, ML models, or argparse.
 
-### cluegen
+### clue-eval
 
-**Solves:** Reusable clue/guess logic for offline tests and live bots.
+**Solves:** Evaluate any `ClueAlgorithm` on synthetic or fixture boards without live play.
 
-**Contains:** `CluegenClueAlgorithm`, `EmbeddingGuessAlgorithm`, test `Scripted*` algorithms, internal `ClueEngine` / `EmbeddingGuessEngine`.
+**Contains:** `BoardFactory`, `Scenario` / `ScenarioRunner`, `BenchmarkRunner`, `board_layout_to_spymaster_view`.
 
-**Does not contain:** Room slugs, `CNOClient`, or CLI strings like `red-spymaster`.
+**May import:** `game-core` only. **Must not import:** `cluegen`, `cno-sdk`, `cno-bots`, `apps/cno`.
+
+### cluegen (optional example)
+
+**Solves:** Example embedding spymaster/guesser code; convenient defaults for `cno-bots` demos.
+
+**Contains:** `ClueEngine`, `CluegenClueAlgorithm`, `EmbeddingGuessAlgorithm`, `Scripted*` algorithms, `cluegen.viz`.
+
+**May import:** `game-core` only. **Must not import:** `clue-eval`, `cno-sdk`, `cno-bots`, `apps/cno`.
 
 ### cno-sdk
 
@@ -62,6 +71,7 @@ Root `pyproject.toml` defines the uv workspace (`apps/*`, `packages/*`) and shar
 
 - [game-core](../implementations/game-core.md)
 - [cluegen](../implementations/cluegen.md)
+- [clue-eval](../implementations/clue-eval.md)
 - [cno-sdk](../implementations/cno-sdk.md)
 - [cno-bots](../implementations/cno-bots.md)
 - [CLI](../implementations/cno-cli.md)

@@ -81,6 +81,7 @@ nav:
   - Implementations:
       - game-core: implementations/game-core.md
       - cluegen: implementations/cluegen.md
+      - clue-eval: implementations/clue-eval.md
       - cno-sdk: implementations/cno-sdk.md
       - cno-bots: implementations/cno-bots.md
       - CLI (apps/cno): implementations/cno-cli.md
@@ -88,6 +89,7 @@ nav:
   - Contributor guides:
       - Overview: contributor-guides/index.md
       - Add a clue algorithm: contributor-guides/adding-clue-algorithm.md
+      - Add a predefined clue test: contributor-guides/adding-clue-test.md
       - Add a guess algorithm: contributor-guides/adding-guess-algorithm.md
       - Add a game backend: contributor-guides/adding-game-backend.md
       - Extend the CLI: contributor-guides/extending-cli.md
@@ -102,6 +104,7 @@ nav:
       - ADR-0001 Layered monorepo: adrs/0001-layered-monorepo.md
       - ADR-0002 Thin CLI and cno-bots: adrs/0002-thin-cli-and-cno-bots.md
       - ADR-0003 Duplicate wire/domain literals: adrs/0003-wire-domain-literals.md
+      - ADR-0004 Clue-eval catalog: adrs/0004-clue-eval-catalog.md
 
 extra:
   social:

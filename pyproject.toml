@@ -12,6 +12,7 @@ dev = [
     "pytest-asyncio",
     "ruff",
     "mypy",
+    "clue-eval",
     "cno",
     "cno-bots",
     "mkdocs>=1.6",
@@ -21,6 +22,7 @@ dev = [
 ]
 
 [tool.uv.sources]
+clue-eval = { workspace = true }
 cno = { workspace = true }
 cno-bots = { workspace = true }
 
@@ -30,6 +32,7 @@ testpaths = [
     "packages/game-core/tests",
     "packages/cno-sdk/tests",
     "packages/cluegen/tests",
+    "packages/clue-eval/tests",
     "packages/cno-bots/tests",
     "apps/cno/tests",
 ]
@@ -45,9 +48,8 @@ extend-exclude = [
     "packages/cluegen/src/cluegen/clue_engine.py",
     "packages/cluegen/src/cluegen/guess_engine.py",
     "packages/cluegen/src/cluegen/generate_vocab.py",
-    "packages/cluegen/src/cluegen/visualization.py",
-    "packages/cluegen/src/cluegen/utils.py",
     "packages/cluegen/src/cluegen/__main__.py",
+    "packages/cluegen/src/cluegen/viz/embeddings.py",
 ]
 
 [tool.ruff.lint]
@@ -69,6 +71,7 @@ mypy_path = [
     "packages/game-core/src",
     "packages/cno-sdk/src",
     "packages/cluegen/src",
+    "packages/clue-eval/src",
     "packages/cno-bots/src",
     "apps/cno/src",
 ]
@@ -81,6 +84,7 @@ module = [
     "cno.interactive",
     "cno.roles",
     "cluegen.algorithms.*",
+    "clue_eval.*",
 ]
 strict = true
 

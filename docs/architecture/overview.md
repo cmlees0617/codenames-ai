@@ -2,12 +2,14 @@
 
 ## Problem
 
-Contributors need to experiment with **how bots decide clues and guesses** without re-implementing Socket.IO, room seating, or turn waiting. The codebase separates:
+Contributors need to experiment with **how bots decide clues and guesses** without re-implementing Socket.IO, room seating, or turn waiting—and to prove clue logic against a **predefined test catalog** (`clue-eval`). The codebase separates:
 
 1. **Domain contracts** — what a spymaster or operative needs to see and return
 2. **Algorithms** — pure decision logic (testable without network)
-3. **CNO players** — async loops that talk to codenames.game
-4. **CLI** — human-facing argument and prompt layer
+3. **Predefined clue tests** — `clue-eval` catalog any `ClueAlgorithm` must pass
+4. **CNO players** — async loops that talk to codenames.game
+5. **CLI** — human-facing argument and prompt layer
+6. **Optional example ML** — `cluegen` (not part of the catalog)
 
 ## Layer diagram
 
@@ -60,6 +62,8 @@ flowchart TB
 |---------|------------|-----------------|
 | `game-core` | stdlib only | `cno-sdk`, `cluegen`, `cno-bots` |
 | `cluegen` | `game-core` | `cno-sdk`, `cno-bots` |
+| `clue-eval` | `game-core` | `cluegen`, `cno-sdk`, `cno-bots` |
+| `cluegen` (optional example) | `game-core` | `clue-eval`, `cno-sdk`, `cno-bots` |
 | `cno-sdk` | stdlib + socket libs | `game-core`, `cluegen` |
 | `cno-bots` | `game-core`, `cluegen`, `cno-sdk` | `questionary` |
 | `apps/cno` | `cno-bots`, `questionary` | Implement game loops inline |

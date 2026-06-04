@@ -17,6 +17,21 @@ uv sync --all-packages --group dev
 
 This installs workspace packages (`game-core`, `cluegen`, `cno-sdk`, `cno-bots`, `cno`) and dev tools (pytest, ruff, mypy, MkDocs).
 
+## Run predefined clue tests
+
+```bash
+# Catalog smoke test (stub ClueAlgorithm, no ML)
+uv run python -m clue_eval --stub
+```
+
+Plug in your own `ClueAlgorithm` via `SuiteRunner` (see [clue-eval](implementations/clue-eval.md)).
+
+Optional embedding example (not the catalog):
+
+```bash
+uv run python -m cluegen
+```
+
 ## Run the CLI
 
 ```bash

@@ -19,7 +19,7 @@ Bots (e.g. `CNOSpymasterBot`) decide how to pick from the list (auto: first item
 
 | Class | Package | Notes |
 |-------|---------|-------|
-| `CluegenClueAlgorithm` | `cluegen.algorithms` | Embeddings via internal [`ClueEngine`](../implementations/cluegen.md) |
+| `CluegenClueAlgorithm` | `cluegen.algorithms` | Optional example; embeddings via [`ClueEngine`](../implementations/cluegen.md) |
 | `ScriptedClueAlgorithm` | `cluegen.algorithms` | Fixed clues for tests |
 
 **Source:** [`algorithms.py`](https://github.com/cmlees0617/codenames-ai/blob/main/packages/game-core/src/game_core/algorithms.py)

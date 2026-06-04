@@ -48,7 +48,8 @@ This site is for **contributors and maintainers**, not external end users.
 apps/cno/              CLI entrypoint (argparse, questionary)
 packages/cno-bots/     CNO player bots + orchestration
 packages/cno-sdk/      codenames.game wire client
-packages/cluegen/      ClueAlgorithm / GuessAlgorithm + ML engines
+packages/clue-eval/    Predefined clue tests + model-agnostic harness
+packages/cluegen/      Optional example embedding algorithms
 packages/game-core/    Domain types and protocols
 ```
 

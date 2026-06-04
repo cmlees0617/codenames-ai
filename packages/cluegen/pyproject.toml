@@ -1,7 +1,7 @@
 [project]
 name = "cluegen"
 version = "0.1.0"
-description = "Offline Codenames spymaster clue generation using semantic embeddings"
+description = "Example embedding-based ClueAlgorithm and guess engines (optional)"
 requires-python = ">=3.12"
 dependencies = [
     "game-core",
@@ -12,6 +12,7 @@ dependencies = [
     "wordfreq",
     "transformers>=5.9.0",
     "accelerate>=1.13.0",
+    "matplotlib>=3.8",
 ]
 
 [tool.uv.sources]

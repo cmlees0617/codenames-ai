@@ -30,6 +30,8 @@ class PlayerBuildOptions:
     random_operative: bool = False
     select_clue: Callable[[list[Clue]], Clue | None] | None = None
     rank_limit: int = 10
+    clue_algorithm: ClueAlgorithm | None = None
+    guess_algorithm: GuessAlgorithm | None = None
 
 
 def build_player(options: PlayerBuildOptions) -> SpymasterPlayer | OperativePlayer:
@@ -42,7 +44,7 @@ def build_player(options: PlayerBuildOptions) -> SpymasterPlayer | OperativePlay
 
 
 def _build_spymaster(options: PlayerBuildOptions) -> SpymasterPlayer:
-    clue_algorithm: ClueAlgorithm = CluegenClueAlgorithm()
+    clue_algorithm: ClueAlgorithm = options.clue_algorithm or CluegenClueAlgorithm()
     return CNOSpymasterBot(
         options.team,
         clue_algorithm,
@@ -54,11 +56,12 @@ def _build_spymaster(options: PlayerBuildOptions) -> SpymasterPlayer:
 
 
 def _build_operative(options: PlayerBuildOptions) -> OperativePlayer:
-    guess_algorithm: GuessAlgorithm = (
-        RandomGuessAlgorithm()
-        if options.random_operative
-        else EmbeddingGuessAlgorithm()
-    )
+    if options.guess_algorithm is not None:
+        guess_algorithm = options.guess_algorithm
+    elif options.random_operative:
+        guess_algorithm = RandomGuessAlgorithm()
+    else:
+        guess_algorithm = EmbeddingGuessAlgorithm()
     return CNOOperativeBot(
         options.team,
         guess_algorithm,

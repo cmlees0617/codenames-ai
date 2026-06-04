@@ -1,35 +1,62 @@
-# cluegen
+# cluegen (example package)
 
-**Path:** [`packages/cluegen`](https://github.com/cmlees0617/codenames-ai/tree/main/packages/cluegen)
+**Path:** `packages/cluegen`
+
+## Role
+
+**Optional example** of embedding-based clue and guess logic. Helpful for demos and as a default in `cno-bots`, but **not required** by `clue-eval`, `game-core`, or the predefined test catalog.
+
+Implement your own `ClueAlgorithm` and run [`clue-eval`](clue-eval.md) to validate against repo tests.
 
 ## Public API
 
-### Algorithms (implement `game-core` protocols)
+### Algorithms (`game-core` protocols)
 
 | Class | Protocol |
 |-------|----------|
-| `CluegenClueAlgorithm` | `ClueAlgorithm` |
+| `CluegenClueAlgorithm` | `ClueAlgorithm` (wraps `ClueEngine`) |
 | `EmbeddingGuessAlgorithm` | `GuessAlgorithm` |
 | `RandomGuessAlgorithm` | `GuessAlgorithm` |
 | `ScriptedClueAlgorithm` / `ScriptedGuessAlgorithm` | Tests |
 
-### Internal engines (not player protocols)
+### Internal engines
 
 | Class | Module | Role |
 |-------|--------|------|
-| `ClueEngine` | `cluegen.clue_engine` | Vocab + embeddings; `generate_clue`, `generate_ranked_clues` |
-| `GuessEngine` | `cluegen.guess_engine` | ABC for batch `guess(clue, count)` |
-| `EmbeddingGuessEngine` | `cluegen.guess_engine` | Cosine similarity guesses |
-| `LLMGuessEngine` | `cluegen.guess_engine` | Local HF model guesses |
+| `ClueEngine` | `cluegen.clue_engine` | Vocab + embeddings |
+| `EmbeddingGuessEngine` / `LLMGuessEngine` | `cluegen.guess_engine` | Offline guess demos |
 
-Rename note: `ClueEngine` / `GuessEngine` replace the old names `Spymaster` / `Operative` to avoid confusion with [`SpymasterPlayer`](../interfaces/spymaster-player.md).
+`CluegenClueAlgorithm(..., prune_vocabulary=True)` controls embedding-specific pruning—not part of `clue-eval` scenarios.
+
+### Visualization
+
+`cluegen.viz.plot_board_and_clue` — debugging plots for `ClueEngine` only.
 
 ## Data
 
-Vocabulary files under `packages/cluegen/data/`.
+Vocabulary under `packages/cluegen/data/`. Evaluation boards live in **`clue-eval/data/`**.
 
-## Demo
+## Example demo
 
 ```bash
 uv run python -m cluegen
+```
+
+## Live bots
+
+`cno_bots.factory` defaults to `CluegenClueAlgorithm` / `EmbeddingGuessAlgorithm` but accepts overrides:
+
+```python
+PlayerBuildOptions(..., clue_algorithm=MyClueAlgorithm())
+```
+
+## Evaluate against repo tests
+
+Same path as any other algorithm:
+
+```python
+from clue_eval import SuiteRunner, default_suite
+from cluegen.algorithms import CluegenClueAlgorithm
+
+SuiteRunner(CluegenClueAlgorithm()).run_suite(default_suite())
 ```
