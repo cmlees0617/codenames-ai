@@ -2,14 +2,16 @@ import math
 
 import numpy as np
 import pytest
-
 from clue_eval.boards import BoardFactory
 from clue_eval.boards.difficulty import (
     _LOG_UNIT,
     board_difficulty,
     team_difficulty,
 )
-from clue_eval.embeddings.store import EmbeddingStore, default_embeddings_path
+from clue_eval.embeddings.store import (
+    EmbeddingStore,
+    default_embeddings_path,
+)
 
 
 def _log_unit(cosine: float) -> float:
@@ -123,8 +125,11 @@ def _affine_mean_difficulty(board, store: EmbeddingStore) -> float:
     from clue_eval.boards.types import BoardLayout
 
     layout: BoardLayout = board
-    blue = _affine_team(layout["blues"], layout["reds"] + layout["civilians"] + layout["assassins"], layout["assassins"], store)
-    red = _affine_team(layout["reds"], layout["blues"] + layout["civilians"] + layout["assassins"], layout["assassins"], store)
+    assassins = layout["assassins"]
+    blue_others = layout["reds"] + layout["civilians"] + assassins
+    red_others = layout["blues"] + layout["civilians"] + assassins
+    blue = _affine_team(layout["blues"], blue_others, assassins, store)
+    red = _affine_team(layout["reds"], red_others, assassins, store)
     return (blue + red) / 2.0
 
 
