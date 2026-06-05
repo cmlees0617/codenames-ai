@@ -20,8 +20,6 @@ packages/clue-eval/
     scenarios/             # Scenario + ScenarioRunner
     suite/                 # ClueTest, TestSuite, catalog, SuiteRunner
     benchmark/             # timing / summary printing
-    operatives/            # three standard operative test conditions
-    clues/                 # spymaster clue legality (stem, homophone, …)
     demos/                 # StubClueAlgorithm for CI smoke
   tests/
 ```
@@ -44,40 +42,6 @@ from my_package import MyClueAlgorithm
 
 results = SuiteRunner(MyClueAlgorithm()).run_suite(default_suite())
 ```
-
-### Operative test conditions
-
-Evaluate a spymaster clue against a fixed operative agent (same GloVe space as board scoring):
-
-| Kind | Class | Behavior |
-|------|--------|----------|
-| `static_embedding` | `StaticEmbeddingGuessAlgorithm` | Top-K board words by cosine to clue |
-| `softmax_embedding` | `SoftmaxEmbeddingGuessAlgorithm` | Sample K words from softmax over top candidates |
-| `llm` | `LlmGuessAlgorithm` | Local instruct LLM; JSON schema `{"words": [...]}` |
-
-```python
-from clue_eval import ScenarioRunner
-from clue_eval.operatives import create_operative_algorithm
-
-runner = ScenarioRunner(
-    MyClueAlgorithm(),
-    operative_condition="static_embedding",
-)
-# or: guess_algorithm=create_operative_algorithm("softmax_embedding", softmax_seed=42)
-```
-
-Install `llm` optional deps for the LLM operative: `uv sync --package clue-eval --extra llm`.
-
-### Clue legality
-
-`validate_clue_legality(clue_word, count, visible_board_words)` enforces:
-
-1. Exactly one non-empty clue token (no spaces).
-2. No substring / shared Snowball stem / WordNet lemma with any visible board word.
-3. No Double Metaphone homophone overlap with a visible board word.
-4. Count ≥ 1.
-
-`ScenarioRunner` adds a `clue_legality` block for the top-ranked clue.
 
 Smoke run (stub algorithm, no ML):
 

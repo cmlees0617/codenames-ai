@@ -4,12 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from game_core.algorithms import ClueAlgorithm, GuessAlgorithm
+from game_core.algorithms import ClueAlgorithm
 from game_core.types import Clue
 
 from clue_eval.boards.views import board_layout_to_spymaster_view
-from clue_eval.clues.legality import validate_clue_legality, visible_words_from_board
-from clue_eval.operatives.simulation import evaluate_operative_turn
 from clue_eval.scenarios.types import Scenario
 
 
@@ -24,22 +22,8 @@ def _clue_to_dict(clue: Clue) -> dict[str, Any]:
 class ScenarioRunner:
     """Execute scenarios using any implementation of ``ClueAlgorithm``."""
 
-    def __init__(
-        self,
-        algorithm: ClueAlgorithm,
-        *,
-        guess_algorithm: GuessAlgorithm | None = None,
-        operative_condition: str | None = None,
-    ) -> None:
+    def __init__(self, algorithm: ClueAlgorithm) -> None:
         self.algorithm = algorithm
-        if guess_algorithm is not None and operative_condition is not None:
-            raise ValueError("Pass guess_algorithm or operative_condition, not both.")
-        self.operative_condition = operative_condition
-        if operative_condition is not None:
-            from clue_eval.operatives.factory import create_operative_algorithm
-
-            guess_algorithm = create_operative_algorithm(operative_condition)  # type: ignore[arg-type]
-        self.guess_algorithm = guess_algorithm
 
     def run(self, scenario: Scenario) -> dict[str, Any]:
         """Rank clues for ``scenario`` and return structured results."""
@@ -66,24 +50,5 @@ class ScenarioRunner:
             result["missing_targets"] = sorted(expected - covered)
         else:
             result["pass"] = None
-
-        if top is not None:
-            legality = validate_clue_legality(
-                top.word,
-                top.count,
-                visible_words_from_board(scenario.board),
-            )
-            result["clue_legality"] = legality.as_dict()
-
-        if self.guess_algorithm is not None and top is not None and top.count > 0:
-            operative = evaluate_operative_turn(
-                scenario.board,
-                scenario.team,
-                top,
-                self.guess_algorithm,
-            )
-            result["operative"] = operative
-            if self.operative_condition is not None:
-                result["operative_condition"] = self.operative_condition
 
         return result
