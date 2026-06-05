@@ -1,7 +1,7 @@
 [project]
 name = "clue-eval"
 version = "0.1.0"
-description = "Model-agnostic tools for testing and benchmarking Codenames clue algorithms"
+description = "Board generation and GloVe difficulty scoring for Codenames benchmarks"
 requires-python = ">=3.12"
 dependencies = [
     "game-core",
