@@ -18,7 +18,7 @@ from clue_eval.boards.types import BoardLayout
 from clue_eval.operatives.views import iter_board_words
 
 
-def test_spymaster_team(board: BoardLayout) -> TeamColor:
+def spymaster_team_for_board(board: BoardLayout) -> TeamColor:
     """Return the team color that has more words on ``board`` (not always blue)."""
     blue_count = len(board["blues"])
     red_count = len(board["reds"])

@@ -12,7 +12,7 @@ from clue_eval.simulation.runner import (
     SpymasterSimulationRunner,
     run_spymaster_benchmark_all_operatives,
 )
-from clue_eval.simulation.state import BoardGameState, test_spymaster_team
+from clue_eval.simulation.state import BoardGameState, spymaster_team_for_board
 
 __all__ = [
     "BoardGameState",
@@ -27,5 +27,5 @@ __all__ = [
     "sanitize_model_filename",
     "save_simulation_results",
     "simulate_game",
-    "test_spymaster_team",
+    "spymaster_team_for_board",
 ]

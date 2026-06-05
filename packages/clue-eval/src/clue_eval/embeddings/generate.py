@@ -37,7 +37,7 @@ def build_store(
     missing: list[str] = []
 
     for word in words:
-        vector = _lookup_vector(model, word)
+        vector = lookup_vector(model, word)
         if vector is not None:
             found_words.append(word)
             rows.append(vector)

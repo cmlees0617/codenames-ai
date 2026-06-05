@@ -27,7 +27,7 @@ class SpymasterSimulationRunner:
     Simulate full games on the standard board set for one spymaster + operative pair.
 
     Boards are loaded into memory once. Each game uses the test spymaster on the
-    team with more words (see :func:`~clue_eval.simulation.state.test_spymaster_team`),
+    team with more words (see :func:`~clue_eval.simulation.state.spymaster_team_for_board`),
     paired with the chosen operative on that same team.
     """
 

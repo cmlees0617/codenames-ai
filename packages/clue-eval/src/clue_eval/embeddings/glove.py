@@ -41,8 +41,8 @@ class GloVeEncoder:
     """
     Encode arbitrary clue phrases in the full ``glove-wiki-gigaword-300`` model.
 
-    Board-word similarity still uses the packaged :class:`~clue_eval.embeddings.store.EmbeddingStore`
-    (Codenames ``words.txt`` only).
+    Board-word similarity still uses the packaged
+    :class:`~clue_eval.embeddings.store.EmbeddingStore` (Codenames ``words.txt`` only).
     """
 
     def __init__(

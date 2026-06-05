@@ -7,13 +7,12 @@ from clue_eval.embeddings.store import EmbeddingStore
 from clue_eval.operatives.algorithms import StaticEmbeddingGuessAlgorithm
 from clue_eval.simulation.game import SimulatedGameResult, simulate_game
 from clue_eval.simulation.naming import resolve_spymaster_name, sanitize_model_filename
-from clue_eval.simulation.results import SimulationBatchResult
-from clue_eval.simulation.results import results_path_for_model
+from clue_eval.simulation.results import SimulationBatchResult, results_path_for_model
 from clue_eval.simulation.runner import (
     SpymasterSimulationRunner,
     run_spymaster_benchmark_all_operatives,
 )
-from clue_eval.simulation.state import BoardGameState, test_spymaster_team
+from clue_eval.simulation.state import BoardGameState, spymaster_team_for_board
 from game_core.types import Clue
 from game_core.views import SpymasterView
 
@@ -44,11 +43,11 @@ def _test_store() -> EmbeddingStore:
     )
 
 
-def test_test_spymaster_team_picks_larger_side():
+def test_spymaster_team_for_board_picks_larger_side():
     blue_heavy = {"blues": ["A"] * 9, "reds": ["B"] * 8, "civilians": [], "assassins": ["X"]}
     red_heavy = {"blues": ["A"] * 5, "reds": ["B"] * 10, "civilians": [], "assassins": ["X"]}
-    assert test_spymaster_team(blue_heavy) == "blue"
-    assert test_spymaster_team(red_heavy) == "red"
+    assert spymaster_team_for_board(blue_heavy) == "blue"
+    assert spymaster_team_for_board(red_heavy) == "red"
 
 
 def test_simulate_game_uses_red_when_red_has_more_words():
@@ -240,11 +239,15 @@ def test_runner_saves_per_game_records(tmp_path):
         _tiny_board(with_difficulty=True),
         {**_tiny_board(with_difficulty=True), "id": 100, "difficulty": {"blue": 0.9, "red": 0.1}},
     ]
+    store = _test_store()
     runner = SpymasterSimulationRunner(
         StubClueAlgorithm(),
         "static_embedding",
         boards=boards,
-        guess_algorithm=StaticEmbeddingGuessAlgorithm(_test_store()),
+        guess_algorithm=StaticEmbeddingGuessAlgorithm(
+            store,
+            clue_encoder=_test_clue_encoder(store),
+        ),
         show_progress=False,
     )
     path = runner.run_and_save(tmp_path / "stub-spymaster_static_embedding.json")
@@ -262,7 +265,11 @@ def test_benchmark_all_operatives_writes_three_files(tmp_path, monkeypatch):
     )
 
     def _fake_create(_kind, **_kwargs):
-        return StaticEmbeddingGuessAlgorithm(_test_store())
+        store = _test_store()
+        return StaticEmbeddingGuessAlgorithm(
+            store,
+            clue_encoder=_test_clue_encoder(store),
+        )
 
     monkeypatch.setattr(
         "clue_eval.simulation.runner.create_operative_algorithm",

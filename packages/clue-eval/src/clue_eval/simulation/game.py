@@ -15,7 +15,7 @@ from clue_eval.simulation.difficulty import difficulty_fields_for_board
 from clue_eval.simulation.state import (
     BoardGameState,
     opponent_team,
-    test_spymaster_team,
+    spymaster_team_for_board,
     tile_color_for_team,
 )
 
@@ -106,7 +106,7 @@ def simulate_game(
     """
     random_source = rng or random.Random()
     state = BoardGameState.from_layout(board)
-    team = test_spymaster_team(board)
+    team = spymaster_team_for_board(board)
     turns = 0
     opponent_turns = 0
     last_clue: str | None = None

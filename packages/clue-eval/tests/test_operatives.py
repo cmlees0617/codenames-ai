@@ -2,12 +2,12 @@ import numpy as np
 import pytest
 from clue_eval.boards.types import BoardLayout
 from clue_eval.embeddings.glove import GloVeEncoder
+from clue_eval.embeddings.sentence_transformer import SentenceTransformerEncoder
 from clue_eval.embeddings.store import EmbeddingStore, default_embeddings_path
 from clue_eval.operatives.algorithms import (
+    StaticCluegenEmbeddingGuessAlgorithm,
     StaticEmbeddingGuessAlgorithm,
 )
-from clue_eval.embeddings.sentence_transformer import SentenceTransformerEncoder
-from clue_eval.operatives.algorithms import StaticCluegenEmbeddingGuessAlgorithm
 from clue_eval.operatives.engines import (
     SoftmaxEmbeddingGuessEngine,
     StaticCluegenEmbeddingGuessEngine,
