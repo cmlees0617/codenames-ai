@@ -70,6 +70,18 @@ uv run python packages/clue-eval/examples/generate_standard_board_set.py
 Writes ``packages/clue-eval/data/standard_boards_5000.json`` (``beta=2.0``, ``seed=42`` by default).
 Load with ``load_boards_from_json`` and split into train/test in application code.
 
+### Use boards in algorithm tests
+
+Convert a fixture layout into a ``SpymasterView`` for unit tests:
+
+```python
+from clue_eval.boards import board_layout_to_spymaster_view, load_boards_from_json
+from clue_eval.paths import default_standard_boards_path
+
+boards = load_boards_from_json(default_standard_boards_path())
+view = board_layout_to_spymaster_view(boards[0], team="blue")
+```
+
 ## Word embeddings (GloVe)
 
 The Codenames word list (`data/words.txt`, 400 words) has precomputed **glove-wiki-gigaword-300** vectors in `data/glove-wiki-gigaword-300.npz` (300 dimensions).

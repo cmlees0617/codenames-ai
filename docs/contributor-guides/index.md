@@ -5,7 +5,7 @@ Task-oriented guides for extending the system. Read [Architecture overview](../a
 | Guide | You will… |
 |-------|-----------|
 | [Add a clue algorithm](adding-clue-algorithm.md) | Implement `ClueAlgorithm` and wire it into `build_player` or tests |
-| [Add a predefined clue test](adding-clue-test.md) | Extend the `clue-eval` catalog |
+| [Add benchmark boards](adding-clue-test.md) | Generate or extend `clue-eval` board sets |
 | [Add a guess algorithm](adding-guess-algorithm.md) | Implement `GuessAlgorithm` for operative bots |
 | [Add a game backend](adding-game-backend.md) | Plan a non-CNO implementation using `GameBackend` |
 | [Extend the CLI](extending-cli.md) | Add flags, prompts, or selection strategies |

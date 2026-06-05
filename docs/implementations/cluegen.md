@@ -4,9 +4,7 @@
 
 ## Role
 
-**Optional example** of embedding-based clue and guess logic. Helpful for demos and as a default in `cno-bots`, but **not required** by `clue-eval`, `game-core`, or the predefined test catalog.
-
-Implement your own `ClueAlgorithm` and run [`clue-eval`](clue-eval.md) to validate against repo tests.
+**Optional example** of embedding-based clue and guess logic. Helpful for demos and as a default in `cno-bots`, but **not required** by `clue-eval`, `game-core`, or live play.
 
 ## Public API
 
@@ -26,7 +24,7 @@ Implement your own `ClueAlgorithm` and run [`clue-eval`](clue-eval.md) to valida
 | `ClueEngine` | `cluegen.clue_engine` | Vocab + embeddings |
 | `EmbeddingGuessEngine` / `LLMGuessEngine` | `cluegen.guess_engine` | Offline guess demos |
 
-`CluegenClueAlgorithm(..., prune_vocabulary=True)` controls embedding-specific pruning—not part of `clue-eval` scenarios.
+`CluegenClueAlgorithm(..., prune_vocabulary=True)` controls embedding-specific pruning.
 
 ### Visualization
 
@@ -34,7 +32,7 @@ Implement your own `ClueAlgorithm` and run [`clue-eval`](clue-eval.md) to valida
 
 ## Data
 
-Vocabulary under `packages/cluegen/data/`. Evaluation boards live in **`clue-eval/data/`**.
+Vocabulary under `packages/cluegen/data/`. Benchmark boards for difficulty scoring live in **`clue-eval/data/`** (see [clue-eval](clue-eval.md)).
 
 ## Example demo
 
@@ -50,13 +48,6 @@ uv run python -m cluegen
 PlayerBuildOptions(..., clue_algorithm=MyClueAlgorithm())
 ```
 
-## Evaluate against repo tests
+## Testing your algorithm
 
-Same path as any other algorithm:
-
-```python
-from clue_eval import SuiteRunner, default_suite
-from cluegen.algorithms import CluegenClueAlgorithm
-
-SuiteRunner(CluegenClueAlgorithm()).run_suite(default_suite())
-```
+Unit-test `rank_clues` with constructed `SpymasterView` objects (see `packages/cluegen/tests/test_algorithms.py`). Use benchmark boards from [clue-eval](clue-eval.md) when you need fixed layouts with difficulty metadata.

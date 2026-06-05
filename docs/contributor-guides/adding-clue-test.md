@@ -1,52 +1,51 @@
-# Add a predefined clue test
+# Add benchmark boards
 
 ## Problem
 
-Contributors need a **shared catalog** of boards and expectations so every `ClueAlgorithm` is judged the same way. Tests live in `clue-eval`, not in `cluegen` or algorithm packages.
+Spymaster benchmarks need **reproducible board sets** with stratified difficulty. Board data and generation live in `clue-eval`, not in `cluegen` or algorithm packages.
 
 ## When to use
 
-- New fixture board or regression case for the catalog
-- New ground-truth targets or tags for benchmarking
+- Regenerate or resize the standard benchmark file
+- Add a custom board JSON for an experiment
+- Tune difficulty stratification (`beta`, candidate pool size, etc.)
 
 ## Steps
 
-### 1. Add board data (if needed)
+### 1. Regenerate the standard 5000-board set
 
-- Drop JSON into `packages/clue-eval/data/`, or
-- Build layouts with `BoardFactory` inside catalog code
+From the repository root:
 
-### 2. Register a `ClueTest`
+```bash
+uv sync --package clue-eval --extra embeddings
+uv run python packages/clue-eval/examples/generate_standard_board_set.py
+```
 
-Edit `packages/clue-eval/src/clue_eval/suite/catalog.py`:
+Options: `-n` / `--count`, `-o` / `--output`, `--seed`, `--beta`. See the script help.
+
+### 2. Generate a smaller custom set in code
 
 ```python
-ClueTest(
-    id="my-case-1",
-    description="What this case checks",
-    scenario=Scenario(
-        name="my-case-1",
-        board={...},
-        team="blue",
-        expected_targets=frozenset({"WORD"}),  # optional
-    ),
-    tags=frozenset({"regression"}),
+from pathlib import Path
+
+from clue_eval.boards import BoardFactory
+from clue_eval.embeddings import EmbeddingStore
+
+store = EmbeddingStore.load()
+BoardFactory.generate_and_save_uniform_difficulty_boards(
+    100,
+    store,
+    Path("my_boards.json"),
+    seed=42,
+    beta=2.0,
 )
 ```
 
-Include the test in `default_suite()` or a new `TestSuite` returned from `all_suites()`.
+Saved JSON is ordered **easiest → hardest** with `id` reassigned and optional `difficulty: {blue, red}` per board.
 
-### 3. Run the catalog
+### 3. Add static fixture boards
 
-```python
-from clue_eval import SuiteRunner, default_suite
-
-SuiteRunner(MyClueAlgorithm()).run_suite(default_suite())
-```
-
-## Future assertions
-
-`ClueTest` is the extension point for non-target checks (clue legality, assassin proximity, etc.) without coupling to any one ML implementation.
+Drop a JSON array into `packages/clue-eval/data/` and load with `load_boards_from_json`. Use the same layout keys as `BoardLayout` (`blues`, `reds`, `civilians`, `assassins`).
 
 ## Related
 

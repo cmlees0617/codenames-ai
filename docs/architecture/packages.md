@@ -5,8 +5,8 @@
 | Package | Path | Responsibility |
 |---------|------|----------------|
 | `game-core` | `packages/game-core` | Domain types, role views, `Protocol`s |
-| `clue-eval` | `packages/clue-eval` | Predefined clue tests + model-agnostic harness |
-| `cluegen` | `packages/cluegen` | Optional example embedding algorithms (not required by eval) |
+| `clue-eval` | `packages/clue-eval` | Benchmark board generation + GloVe difficulty |
+| `cluegen` | `packages/cluegen` | Optional example embedding algorithms |
 | `cno-sdk` | `packages/cno-sdk` | codenames.game Socket.IO client, `GameState` parsing |
 | `cno-bots` | `packages/cno-bots` | View adapter, `CNOSpymasterBot`, `CNOOperativeBot`, `run_full_game` |
 | `cno` | `apps/cno` | `cno` console script — prompts and argparse only |
@@ -25,11 +25,11 @@ Root `pyproject.toml` defines the uv workspace (`apps/*`, `packages/*`) and shar
 
 ### clue-eval
 
-**Solves:** Evaluate any `ClueAlgorithm` on synthetic or fixture boards without live play.
+**Solves:** Produce reproducible Codenames board sets with per-team difficulty scores for spymaster benchmarking.
 
-**Contains:** `BoardFactory`, `Scenario` / `ScenarioRunner`, `BenchmarkRunner`, `board_layout_to_spymaster_view`.
+**Contains:** `BoardFactory`, `board_difficulty` / `team_difficulty`, `EmbeddingStore`, `generate_standard_board_set.py`, `board_layout_to_spymaster_view`.
 
-**May import:** `game-core` only. **Must not import:** `cluegen`, `cno-sdk`, `cno-bots`, `apps/cno`.
+**May import:** `game-core`, `numpy`, `tqdm`, optional `gensim` (embeddings extra). **Must not import:** `cluegen`, `cno-sdk`, `cno-bots`, `apps/cno`.
 
 ### cluegen (optional example)
 

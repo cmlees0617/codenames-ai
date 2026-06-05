@@ -7,6 +7,6 @@ Python monorepo for [Codenames Online](https://codenames.game) bots: wire client
 ```bash
 uv sync --all-packages --group dev
 uv run cno                          # join a live room
-uv run python -m clue_eval --stub    # predefined clue test catalog (smoke)
-uv run python -m cluegen             # optional embedding example (not the catalog)
+uv run python -m cluegen             # optional embedding example
+uv run python packages/clue-eval/examples/generate_standard_board_set.py  # benchmark boards
 ```
