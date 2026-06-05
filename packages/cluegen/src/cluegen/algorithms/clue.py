@@ -63,10 +63,22 @@ def _result_to_clue(result: dict[str, Any]) -> Clue:
 class CluegenClueAlgorithm:
     """Rank clues using semantic embeddings (cluegen ``ClueEngine``)."""
 
-    def __init__(self, *, vocab_path: Path | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        vocab_path: Path | None = None,
+        prune_vocabulary: bool = True,
+    ) -> None:
         self._vocab_path = vocab_path or default_vocab_path()
+        self._prune_vocabulary = prune_vocabulary
         self._engine: ClueEngine | None = None
         self._board_words: tuple[str, ...] | None = None
+
+    def engine_for_debug(self) -> ClueEngine:
+        """Return the loaded engine after :meth:`rank_clues` (local debugging / viz only)."""
+        if self._engine is None:
+            raise RuntimeError("Call rank_clues before accessing the engine.")
+        return self._engine
 
     def _ensure_loaded(self) -> ClueEngine:
         if self._engine is None:
@@ -103,7 +115,8 @@ class CluegenClueAlgorithm:
                 enemies=enemies,
                 assassins=assassins,
             )
-            engine.prune_vocabulary()
+            if self._prune_vocabulary:
+                engine.prune_vocabulary()
             results = engine.generate_ranked_clues(
                 min_targets=1,
                 max_targets=max_targets,

@@ -5,7 +5,8 @@
 | Package | Path | Responsibility |
 |---------|------|----------------|
 | `game-core` | `packages/game-core` | Domain types, role views, `Protocol`s |
-| `cluegen` | `packages/cluegen` | Algorithm implementations + `ClueEngine` / `GuessEngine` ML |
+| `clue-eval` | `packages/clue-eval` | Benchmark board generation + GloVe difficulty |
+| `cluegen` | `packages/cluegen` | Optional example embedding algorithms |
 | `cno-sdk` | `packages/cno-sdk` | codenames.game Socket.IO client, `GameState` parsing |
 | `cno-bots` | `packages/cno-bots` | View adapter, `CNOSpymasterBot`, `CNOOperativeBot`, `run_full_game` |
 | `cno` | `apps/cno` | `cno` console script — prompts and argparse only |
@@ -22,13 +23,21 @@ Root `pyproject.toml` defines the uv workspace (`apps/*`, `packages/*`) and shar
 
 **Does not contain:** HTTP, sockets, ML models, or argparse.
 
-### cluegen
+### clue-eval
 
-**Solves:** Reusable clue/guess logic for offline tests and live bots.
+**Solves:** Produce reproducible Codenames board sets with per-team difficulty scores for spymaster benchmarking.
 
-**Contains:** `CluegenClueAlgorithm`, `EmbeddingGuessAlgorithm`, test `Scripted*` algorithms, internal `ClueEngine` / `EmbeddingGuessEngine`.
+**Contains:** `BoardFactory`, `board_difficulty` / `team_difficulty`, `EmbeddingStore`, `generate_standard_board_set.py`, `board_layout_to_spymaster_view`.
 
-**Does not contain:** Room slugs, `CNOClient`, or CLI strings like `red-spymaster`.
+**May import:** `game-core`, `numpy`, `tqdm`, optional `gensim` (embeddings extra). **Must not import:** `cluegen`, `cno-sdk`, `cno-bots`, `apps/cno`.
+
+### cluegen (optional example)
+
+**Solves:** Example embedding spymaster/guesser code; convenient defaults for `cno-bots` demos.
+
+**Contains:** `ClueEngine`, `CluegenClueAlgorithm`, `EmbeddingGuessAlgorithm`, `Scripted*` algorithms, `cluegen.viz`.
+
+**May import:** `game-core` only. **Must not import:** `clue-eval`, `cno-sdk`, `cno-bots`, `apps/cno`.
 
 ### cno-sdk
 
@@ -62,6 +71,7 @@ Root `pyproject.toml` defines the uv workspace (`apps/*`, `packages/*`) and shar
 
 - [game-core](../implementations/game-core.md)
 - [cluegen](../implementations/cluegen.md)
+- [clue-eval](../implementations/clue-eval.md)
 - [cno-sdk](../implementations/cno-sdk.md)
 - [cno-bots](../implementations/cno-bots.md)
 - [CLI](../implementations/cno-cli.md)

@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "blues": [
+      "STREAM",
+      "WASHER",
+      "MINE",
+      "BEAR",
+      "BIKINI",
+      "PENCIL",
+      "MEXICO",
+      "BACK",
+      "PASS"
+    ],
+    "reds": [
+      "RAINBOW",
+      "DISK",
+      "WHEEL",
+      "TROLL",
+      "POCKET",
+      "STRING",
+      "BLADE",
+      "WHEELCHAIR"
+    ],
+    "civilians": ["WAR", "HONEY", "SILK", "RIP", "CANE", "SWEAT", "HOTEL"],
+    "assassins": ["ORGAN"]
+  }
+]

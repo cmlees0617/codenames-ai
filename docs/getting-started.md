@@ -15,7 +15,22 @@ cd codenames-ai
 uv sync --all-packages --group dev
 ```
 
-This installs workspace packages (`game-core`, `cluegen`, `cno-sdk`, `cno-bots`, `cno`) and dev tools (pytest, ruff, mypy, MkDocs).
+This installs workspace packages (`game-core`, `clue-eval`, `cluegen`, `cno-sdk`, `cno-bots`, `cno`) and dev tools (pytest, ruff, mypy, MkDocs).
+
+## Generate benchmark boards
+
+```bash
+uv sync --package clue-eval --extra embeddings
+uv run python packages/clue-eval/examples/generate_standard_board_set.py
+```
+
+Writes `packages/clue-eval/data/standard_boards_5000.json` (see [clue-eval](implementations/clue-eval.md)).
+
+Optional embedding spymaster example:
+
+```bash
+uv run python -m cluegen
+```
 
 ## Run the CLI
 
@@ -57,6 +72,7 @@ Open [http://127.0.0.1:8000](http://127.0.0.1:8000). Production builds deploy to
 |------|------------|
 | New clue strategy | [Add a clue algorithm](contributor-guides/adding-clue-algorithm.md) |
 | New guess strategy | [Add a guess algorithm](contributor-guides/adding-guess-algorithm.md) |
+| Benchmark board sets | [Add benchmark boards](contributor-guides/adding-clue-test.md) |
 | New Codenames backend | [Add a game backend](contributor-guides/adding-game-backend.md) |
 | CLI flags or prompts | [Extend the CLI](contributor-guides/extending-cli.md) |
 | Wire protocol / parsing | `packages/cno-sdk` (keep free of `game-core`) |

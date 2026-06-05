@@ -6,8 +6,10 @@ Contributors need to experiment with **how bots decide clues and guesses** witho
 
 1. **Domain contracts** — what a spymaster or operative needs to see and return
 2. **Algorithms** — pure decision logic (testable without network)
-3. **CNO players** — async loops that talk to codenames.game
-4. **CLI** — human-facing argument and prompt layer
+3. **Benchmark boards** — `clue-eval` generates stratified Codenames layouts with GloVe difficulty metadata
+4. **CNO players** — async loops that talk to codenames.game
+5. **CLI** — human-facing argument and prompt layer
+6. **Optional example ML** — `cluegen`
 
 ## Layer diagram
 
@@ -35,6 +37,11 @@ flowchart TB
     CE["ClueEngine (internal ML)"]
   end
 
+  subgraph eval ["packages/clue-eval"]
+    BF["BoardFactory + difficulty"]
+    ES["EmbeddingStore (GloVe)"]
+  end
+
   subgraph wire ["packages/cno-sdk"]
     Client["CNOClient"]
   end
@@ -52,7 +59,11 @@ flowchart TB
   SMB --> Client
   OPB --> Client
   Views --> Types
+  BF --> ES
+  BF --> Types
 ```
+
+`clue-eval` is offline benchmark tooling: it does not participate in live bot loops.
 
 ## Dependency rules (invariants)
 
@@ -60,6 +71,7 @@ flowchart TB
 |---------|------------|-----------------|
 | `game-core` | stdlib only | `cno-sdk`, `cluegen`, `cno-bots` |
 | `cluegen` | `game-core` | `cno-sdk`, `cno-bots` |
+| `clue-eval` | `game-core` | `cluegen`, `cno-sdk`, `cno-bots` |
 | `cno-sdk` | stdlib + socket libs | `game-core`, `cluegen` |
 | `cno-bots` | `game-core`, `cluegen`, `cno-sdk` | `questionary` |
 | `apps/cno` | `cno-bots`, `questionary` | Implement game loops inline |
@@ -74,6 +86,7 @@ Violating these creates cycles and makes algorithms untestable against live serv
 | `GuessAlgorithm` | New way to pick guesses | [Adding a guess algorithm](../contributor-guides/adding-guess-algorithm.md) |
 | `GameBackend` | Non-CNO Codenames implementation | [Adding a game backend](../contributor-guides/adding-game-backend.md) |
 | `select_clue` callback | Human-in-the-loop spymaster (CLI) | [Extend the CLI](../contributor-guides/extending-cli.md) |
+| Benchmark board sets | Reproducible stratified layouts for offline evaluation | [Add benchmark boards](../contributor-guides/adding-clue-test.md) |
 
 `SpymasterPlayer` / `OperativePlayer` are implemented today only by CNO bots; new backends would add new player classes, not change the protocols.
 
