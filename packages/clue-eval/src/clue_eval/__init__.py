@@ -6,17 +6,33 @@ from clue_eval.boards.io import load_boards_from_json
 from clue_eval.boards.types import BoardLayout
 from clue_eval.boards.views import board_layout_to_spymaster_view
 from clue_eval.paths import package_data_dir
+from clue_eval.clues import (
+    ClueLegalityResult,
+    is_legal_clue,
+    validate_clue_legality,
+)
+from clue_eval.operatives import (
+    OPERATIVE_KINDS,
+    OperativeKind,
+    create_operative_algorithm,
+)
 from clue_eval.scenarios.runner import ScenarioRunner
 from clue_eval.scenarios.types import Scenario
 from clue_eval.suite import ClueTest, SuiteRunner, TestSuite, all_suites, default_suite
 
 __all__ = [
+    "OPERATIVE_KINDS",
+    "OperativeKind",
     "BenchmarkRunner",
     "BoardFactory",
     "BoardLayout",
+    "ClueLegalityResult",
     "ClueTest",
     "Scenario",
     "ScenarioRunner",
+    "create_operative_algorithm",
+    "is_legal_clue",
+    "validate_clue_legality",
     "SuiteRunner",
     "TestSuite",
     "all_suites",

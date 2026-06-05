@@ -5,6 +5,8 @@ description = "Model-agnostic tools for testing and benchmarking Codenames clue 
 requires-python = ">=3.12"
 dependencies = [
     "game-core",
+    "metaphone>=0.6",
+    "nltk>=3.8",
     "numpy",
     "tqdm",
 ]
@@ -12,6 +14,10 @@ dependencies = [
 [project.optional-dependencies]
 embeddings = [
     "gensim>=4.3.2",
+]
+llm = [
+    "transformers>=4.40",
+    "accelerate>=1.0",
 ]
 
 [project.scripts]
