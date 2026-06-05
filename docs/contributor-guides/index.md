@@ -2,6 +2,9 @@
 
 Task-oriented guides for extending the system. Read [Architecture overview](../architecture/overview.md) first.
 
+!!! warning "Spymaster test pipeline (WIP)"
+    Branch `feature/spymaster-test-pipeline` adds a full-game benchmark harness in `clue-eval` that is **experimental** and likely to be massively reworked. See [clue-eval](../implementations/clue-eval.md) for current behavior; prefer the predefined catalog for stable regression tests.
+
 | Guide | You will… |
 |-------|-----------|
 | [Add a clue algorithm](adding-clue-algorithm.md) | Implement `ClueAlgorithm` and wire it into `build_player` or tests |

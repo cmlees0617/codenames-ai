@@ -22,7 +22,8 @@ def _demo_view() -> SpymasterView:
 
 def main() -> None:
     print("Example CluegenClueAlgorithm demo (optional package, not the eval catalog).")
-    print("Predefined tests: uv run python -m clue_eval --stub")
+    print("Catalog smoke test: uv run python -m clue_eval --stub")
+    print("WIP benchmark: uv run python packages/clue-eval/examples/run_spymaster_simulation.py --cluegen --sample 10")
     algorithm = CluegenClueAlgorithm(vocab_path=default_vocab_path())
     clues = algorithm.rank_clues(_demo_view(), limit=3)
     for clue in clues:

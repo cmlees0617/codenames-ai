@@ -63,6 +63,9 @@ SuiteRunner(CluegenClueAlgorithm()).run_suite(default_suite())
 
 ## Full-game benchmark (5000 boards × 3 operatives)
 
+!!! warning "Test pipeline in progress"
+    This benchmark path lives on branch `feature/spymaster-test-pipeline` and is **experimental**. Game rules, operatives, and outputs are likely to be massively reworked—use for exploration only.
+
 `CluegenClueAlgorithm` implements [`ClueAlgorithm`](../interfaces/clue-algorithm.md) via
 ``rank_clues(state: SpymasterView, *, limit=10) -> list[Clue]`` and sets ``name = "cluegen"`` for
 result files under ``packages/clue-eval/data/results/``.
@@ -115,4 +118,4 @@ The first ``rank_clues`` call loads vocabulary and embeddings; the full 15k-game
 Codenames board words. Cluegen + ``static_embedding`` is a valid pairing; only clues with no GloVe
 vector at all are skipped.
 
-See [clue-eval simulation](clue-eval.md#full-game-spymaster-simulation-5000-boards).
+See [clue-eval test pipeline](clue-eval.md#spymaster-test-pipeline-full-game-benchmark-5000-boards).

@@ -10,10 +10,14 @@ uv run pytest -m "not integration"
 |---------|------|-------|
 | `game-core` | `packages/game-core/tests` | Types, protocols |
 | `cluegen` | `packages/cluegen/tests` | Engines + algorithms (mocked ML) |
-| `clue-eval` | `packages/clue-eval/tests` | Boards, scenarios, fixtures |
+| `clue-eval` | `packages/clue-eval/tests` | Boards, scenarios, catalog, simulation (WIP pipeline) |
 | `cno-sdk` | `packages/cno-sdk/tests` | Protocol parsing, fixtures |
 | `cno-bots` | `packages/cno-bots/tests` | View mapping, protocols |
 | `cno` | `apps/cno/tests` | Argparse, interactive wiring |
+
+## Spymaster test pipeline (manual / experimental)
+
+The full-game benchmark CLI (`packages/clue-eval/examples/run_spymaster_simulation.py`) is **not** part of default CI. It is work in progress on `feature/spymaster-test-pipeline` and likely to be massively reworked—run locally for exploration only.
 
 ## Integration tests
 

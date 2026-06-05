@@ -46,7 +46,7 @@ Export from `cluegen.algorithms.__init__` if it should ship with the package.
 
 **Factory (default live path):** extend `cno_bots.factory._build_spymaster` if this should replace `CluegenClueAlgorithm`, or add a factory option / env flag.
 
-**Tests:** use `ScriptedClueAlgorithm` as a template, or unit-test `rank_clues` with a minimal `SpymasterView` (see `packages/cluegen/tests/test_algorithms.py`). For the repo catalog, use `SuiteRunner` + `default_suite()` from [clue-eval](../implementations/clue-eval.md)—you are graded against predefined cases, not against `cluegen`.
+**Tests:** use `ScriptedClueAlgorithm` as a template, or unit-test `rank_clues` with a minimal `SpymasterView` (see `packages/cluegen/tests/test_algorithms.py`). For the repo catalog, use `SuiteRunner` + `default_suite()` from [clue-eval](../implementations/clue-eval.md)—you are graded against predefined cases, not against `cluegen`. The full-game spymaster benchmark on `feature/spymaster-test-pipeline` is **WIP** and unstable; prefer the catalog for regression tests until the pipeline stabilizes.
 
 ### 3. Document
 

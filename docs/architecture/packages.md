@@ -5,7 +5,7 @@
 | Package | Path | Responsibility |
 |---------|------|----------------|
 | `game-core` | `packages/game-core` | Domain types, role views, `Protocol`s |
-| `clue-eval` | `packages/clue-eval` | Predefined clue tests + model-agnostic harness |
+| `clue-eval` | `packages/clue-eval` | Clue-test catalog + WIP spymaster test pipeline |
 | `cluegen` | `packages/cluegen` | Optional example embedding algorithms (not required by eval) |
 | `cno-sdk` | `packages/cno-sdk` | codenames.game Socket.IO client, `GameState` parsing |
 | `cno-bots` | `packages/cno-bots` | View adapter, `CNOSpymasterBot`, `CNOOperativeBot`, `run_full_game` |
@@ -25,11 +25,14 @@ Root `pyproject.toml` defines the uv workspace (`apps/*`, `packages/*`) and shar
 
 ### clue-eval
 
-**Solves:** Evaluate any `ClueAlgorithm` on synthetic or fixture boards without live play.
+**Solves:** Evaluate any `ClueAlgorithm` on synthetic or fixture boards without live play, plus an in-progress full-game spymaster benchmark (branch `feature/spymaster-test-pipeline`).
 
-**Contains:** `BoardFactory`, `Scenario` / `ScenarioRunner`, `BenchmarkRunner`, `board_layout_to_spymaster_view`.
+!!! warning "Pipeline in progress"
+    Simulation rules, operative agents, and benchmark outputs are unstable and likely to be massively reworked.
 
-**May import:** `game-core` only. **Must not import:** `cluegen`, `cno-sdk`, `cno-bots`, `apps/cno`.
+**Contains:** `BoardFactory`, `SuiteRunner` / `ScenarioRunner`, clue legality checks, operative test conditions, `simulation` runners, `run_spymaster_simulation.py`, `board_layout_to_spymaster_view`.
+
+**May import:** `game-core`, `numpy`, `tqdm`, optional `gensim` / `transformers` / `sentence-transformers`. **Must not import:** `cluegen`, `cno-sdk`, `cno-bots`, `apps/cno`.
 
 ### cluegen (optional example)
 

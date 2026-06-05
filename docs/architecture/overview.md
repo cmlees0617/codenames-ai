@@ -6,10 +6,14 @@ Contributors need to experiment with **how bots decide clues and guesses** witho
 
 1. **Domain contracts** — what a spymaster or operative needs to see and return
 2. **Algorithms** — pure decision logic (testable without network)
-3. **Predefined clue tests** — `clue-eval` catalog any `ClueAlgorithm` must pass
-4. **CNO players** — async loops that talk to codenames.game
-5. **CLI** — human-facing argument and prompt layer
-6. **Optional example ML** — `cluegen` (not part of the catalog)
+3. **Predefined clue tests** — `clue-eval` catalog any `ClueAlgorithm` can run through
+4. **Spymaster test pipeline** — `clue-eval` full-game benchmark on stratified boards (WIP on `feature/spymaster-test-pipeline`)
+5. **CNO players** — async loops that talk to codenames.game
+6. **CLI** — human-facing argument and prompt layer
+7. **Optional example ML** — `cluegen` (not part of the catalog)
+
+!!! warning "Test pipeline in progress"
+    The benchmark harness (simulation loop, operative agents, result JSON) is experimental and likely to be massively reworked. Treat it as a prototype, not a stable contract.
 
 ## Layer diagram
 
@@ -37,6 +41,11 @@ flowchart TB
     CE["ClueEngine (internal ML)"]
   end
 
+  subgraph eval ["packages/clue-eval"]
+    SR["SuiteRunner + catalog"]
+    SIM["Spymaster test pipeline (WIP)"]
+  end
+
   subgraph wire ["packages/cno-sdk"]
     Client["CNOClient"]
   end
@@ -54,7 +63,11 @@ flowchart TB
   SMB --> Client
   OPB --> Client
   Views --> Types
+  SR --> Proto
+  SIM --> Proto
 ```
+
+`clue-eval` is offline evaluation tooling; it does not participate in live bot loops.
 
 ## Dependency rules (invariants)
 
@@ -78,6 +91,7 @@ Violating these creates cycles and makes algorithms untestable against live serv
 | `GuessAlgorithm` | New way to pick guesses | [Adding a guess algorithm](../contributor-guides/adding-guess-algorithm.md) |
 | `GameBackend` | Non-CNO Codenames implementation | [Adding a game backend](../contributor-guides/adding-game-backend.md) |
 | `select_clue` callback | Human-in-the-loop spymaster (CLI) | [Extend the CLI](../contributor-guides/extending-cli.md) |
+| Spymaster test pipeline | Full-game benchmark vs fixed operatives (WIP) | [clue-eval](../implementations/clue-eval.md) |
 
 `SpymasterPlayer` / `OperativePlayer` are implemented today only by CNO bots; new backends would add new player classes, not change the protocols.
 

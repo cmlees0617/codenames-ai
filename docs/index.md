@@ -4,7 +4,10 @@ This site documents the **codenames-ai** Python monorepo for **contributors and 
 
 ## What this repository does
 
-The project connects AI bots to [Codenames Online](https://codenames.game): spymasters rank clues from board state, operatives guess words, and a thin CLI starts bots in live rooms. Offline embedding search lives in **cluegen**.
+The project connects AI bots to [Codenames Online](https://codenames.game): spymasters rank clues from board state, operatives guess words, and a thin CLI starts bots in live rooms. Offline embedding search lives in **cluegen**. **clue-eval** provides a predefined clue-test catalog and an in-progress **spymaster test pipeline** (full-game benchmarks on stratified boards).
+
+!!! warning "Test pipeline in progress"
+    On branch `feature/spymaster-test-pipeline`, the benchmark harness (operatives, simulated games, result files) is **experimental** and likely to be massively reworked. See [clue-eval](implementations/clue-eval.md) for current behavior and caveats.
 
 ## How to read this site
 
@@ -48,7 +51,7 @@ This site is for **contributors and maintainers**, not external end users.
 apps/cno/              CLI entrypoint (argparse, questionary)
 packages/cno-bots/     CNO player bots + orchestration
 packages/cno-sdk/      codenames.game wire client
-packages/clue-eval/    Predefined clue tests + model-agnostic harness
+packages/clue-eval/    Clue-test catalog + WIP spymaster test pipeline
 packages/cluegen/      Optional example embedding algorithms
 packages/game-core/    Domain types and protocols
 ```

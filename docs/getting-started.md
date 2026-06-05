@@ -15,7 +15,7 @@ cd codenames-ai
 uv sync --all-packages --group dev
 ```
 
-This installs workspace packages (`game-core`, `cluegen`, `cno-sdk`, `cno-bots`, `cno`) and dev tools (pytest, ruff, mypy, MkDocs).
+This installs workspace packages (`game-core`, `clue-eval`, `cluegen`, `cno-sdk`, `cno-bots`, `cno`) and dev tools (pytest, ruff, mypy, MkDocs).
 
 ## Run predefined clue tests
 
@@ -31,6 +31,20 @@ Optional embedding example (not the catalog):
 ```bash
 uv run python -m cluegen
 ```
+
+## Spymaster test pipeline (experimental)
+
+On branch `feature/spymaster-test-pipeline`, `clue-eval` includes a **work-in-progress** full-game benchmark: spymasters are scored against fixed operative agents on the standard 5000-board set.
+
+!!! warning "Likely to be reworked"
+    Operative conditions, game rules, CLI flags, and result JSON are unstable. Expect breaking changes without notice while the pipeline is designed.
+
+```bash
+uv sync --package clue-eval --extra embeddings --extra llm
+uv run python packages/clue-eval/examples/run_spymaster_simulation.py --cluegen --sample 10
+```
+
+Debug flags: `--operative KIND`, `-n` / `--sample`. Full details: [clue-eval](implementations/clue-eval.md#spymaster-test-pipeline-full-game-benchmark-5000-boards).
 
 ## Run the CLI
 
@@ -71,6 +85,7 @@ Open [http://127.0.0.1:8000](http://127.0.0.1:8000). Production builds deploy to
 | Goal | Start here |
 |------|------------|
 | New clue strategy | [Add a clue algorithm](contributor-guides/adding-clue-algorithm.md) |
+| Spymaster benchmark / catalog | [clue-eval](implementations/clue-eval.md) (pipeline WIP) |
 | New guess strategy | [Add a guess algorithm](contributor-guides/adding-guess-algorithm.md) |
 | New Codenames backend | [Add a game backend](contributor-guides/adding-game-backend.md) |
 | CLI flags or prompts | [Extend the CLI](contributor-guides/extending-cli.md) |

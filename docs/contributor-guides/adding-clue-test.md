@@ -1,5 +1,8 @@
 # Add a predefined clue test
 
+!!! warning "Test pipeline in progress"
+    Branch `feature/spymaster-test-pipeline` also adds a full-game benchmark harness that is **experimental** and likely to be massively reworked. This guide covers the **catalog** (`ClueTest` / `SuiteRunner`); see [clue-eval](../implementations/clue-eval.md) for the WIP simulation path.
+
 ## Problem
 
 Contributors need a **shared catalog** of boards and expectations so every `ClueAlgorithm` is judged the same way. Tests live in `clue-eval`, not in `cluegen` or algorithm packages.

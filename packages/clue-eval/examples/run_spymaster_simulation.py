@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-Run the 5000-board spymaster benchmark against operative test conditions.
+Run the 5000-board spymaster test pipeline (experimental).
+
+WORK IN PROGRESS (branch ``feature/spymaster-test-pipeline``): game rules, operative
+agents, CLI flags, and result JSON are likely to be massively reworked. Treat this
+CLI as a prototype, not a stable contract.
 
 Full run (default): 3 × 5000 = 15,000 games, three JSON files.
 

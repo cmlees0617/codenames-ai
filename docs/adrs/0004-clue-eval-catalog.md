@@ -1,10 +1,12 @@
 # ADR-0004: Predefined clue-eval catalog; cluegen as optional example
 
-**Status:** Accepted
+**Status:** Accepted (amended on `feature/spymaster-test-pipeline`)
 
 ## Context
 
 Contributors should validate custom `ClueAlgorithm` implementations against a **shared, predefined test catalog** maintained in the repo—not against whichever embedding model ships in `cluegen`. The embedding spymaster is one possible implementation, useful for demos and as a reference for authors, but it must not be a required dependency of evaluation or of the core bot stack.
+
+On branch `feature/spymaster-test-pipeline`, `clue-eval` also carries an **in-progress spymaster test pipeline**: full-game simulation against fixed operative agents on the 5000-board benchmark set. That pipeline is **experimental**—APIs, game rules, operative kinds, and result formats are likely to be massively reworked before any stable release.
 
 ## Decision
 
@@ -30,3 +32,4 @@ Contributors should validate custom `ClueAlgorithm` implementations against a **
 
 - Expand `ClueTest` with assertions beyond `expected_targets` (legality, safety, etc.)
 - Optional JSON-driven catalog files per suite
+- Stabilize the spymaster test pipeline (operatives, game loop, scoring) after design review; expect breaking changes until then

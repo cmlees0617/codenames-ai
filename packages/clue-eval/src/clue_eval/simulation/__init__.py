@@ -1,4 +1,4 @@
-"""Full-game spymaster benchmark simulation."""
+"""Full-game spymaster test pipeline (experimental; likely to be reworked)."""
 
 from clue_eval.simulation.game import GameOutcome, SimulatedGameResult, simulate_game
 from clue_eval.simulation.naming import resolve_spymaster_name, sanitize_model_filename

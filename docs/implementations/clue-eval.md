@@ -2,13 +2,16 @@
 
 **Path:** `packages/clue-eval`
 
+!!! warning "Work in progress"
+    The **spymaster test pipeline** on branch `feature/spymaster-test-pipeline` is experimental and incomplete. Catalog cases, operative agents, simulated game rules, CLI flags, and result JSON formats are likely to change substantially—or be replaced entirely. Treat the examples below as provisional; avoid building long-lived integrations against them until the pipeline stabilizes.
+
 ## Purpose
 
-**Predefined clue tests** and a **model-agnostic harness** for running any [`ClueAlgorithm`](../interfaces/clue-algorithm.md) through them.
+**Predefined clue tests** and a **model-agnostic harness** for running any [`ClueAlgorithm`](../interfaces/clue-algorithm.md) through them, plus an in-progress **full-game spymaster benchmark** (5000 boards × operative conditions).
 
 Contributors implement `ClueAlgorithm`, then run the repo catalog—they are **not** scored against another algorithm in the monorepo (including `cluegen`).
 
-Depends on **`game-core` only**.
+Depends on **`game-core` only** (optional extras for GloVe, LLM, and sentence-transformer operatives).
 
 ## Layout
 
@@ -20,9 +23,12 @@ packages/clue-eval/
     scenarios/             # Scenario + ScenarioRunner
     suite/                 # ClueTest, TestSuite, catalog, SuiteRunner
     benchmark/             # timing / summary printing
-    operatives/            # three standard operative test conditions
+    simulation/            # full-game benchmark runner (WIP)
+    operatives/            # standard operative test conditions (WIP)
     clues/                 # spymaster clue legality (stem, homophone, …)
     demos/                 # StubClueAlgorithm for CI smoke
+  examples/
+    run_spymaster_simulation.py   # CLI for the WIP benchmark pipeline
   tests/
 ```
 
@@ -80,7 +86,10 @@ Install `llm` optional deps for the LLM operative: `uv sync --package clue-eval 
 
 `ScenarioRunner` adds a `clue_legality` block for the top-ranked clue.
 
-### Full-game spymaster simulation (5000 boards)
+### Spymaster test pipeline — full-game benchmark (5000 boards)
+
+!!! warning "Likely to be reworked"
+    This path is the newest and least stable part of `clue-eval`. Game-loop rules, operative kinds, scoring, and output layout may change without a deprecation period while the pipeline is designed.
 
 The default benchmark runs **all three** operative test conditions: 3 × 5000 = **15,000**
 games per spymaster, with one JSON file per operative:
