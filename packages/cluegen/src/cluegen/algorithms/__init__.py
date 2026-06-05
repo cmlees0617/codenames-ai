@@ -1,3 +1,5 @@
+from typing import Any
+
 from cluegen.algorithms.clue import CluegenClueAlgorithm
 from cluegen.algorithms.scripted import ScriptedClueAlgorithm, ScriptedGuessAlgorithm
 
@@ -10,7 +12,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str):
+def __getattr__(name: str) -> Any:
     if name == "EmbeddingGuessAlgorithm":
         from cluegen.algorithms.guess import EmbeddingGuessAlgorithm
 
