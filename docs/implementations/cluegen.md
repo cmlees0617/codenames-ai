@@ -4,9 +4,9 @@
 
 ## Role
 
-**Optional example** of embedding-based clue and guess logic. Helpful for demos and as a default in `cno-bots`, but **not required** by `clue-eval`, `game-core`, or the predefined test catalog.
+**Optional example** of embedding-based clue and guess logic. Helpful for demos and as a default in `cno-bots`, but **not required** by `clue-eval`, `game-core`, or live play.
 
-Implement your own `ClueAlgorithm` and run [`clue-eval`](clue-eval.md) to validate against repo tests.
+Implement your own `ClueAlgorithm` and run [`clue-eval`](clue-eval.md) against benchmark boards (stable) or the clue-test catalog (`feature/spymaster-test-pipeline`).
 
 ## Public API
 
@@ -64,7 +64,7 @@ SuiteRunner(CluegenClueAlgorithm()).run_suite(default_suite())
 ## Full-game benchmark (5000 boards × 3 operatives)
 
 !!! warning "Test pipeline in progress"
-    This benchmark path lives on branch `feature/spymaster-test-pipeline` and is **experimental**. Game rules, operatives, and outputs are likely to be massively reworked—use for exploration only.
+    This benchmark path exists only on branch `feature/spymaster-test-pipeline` and is **experimental**. Game rules, operatives, and outputs are likely to be massively reworked before merge—use for exploration only.
 
 `CluegenClueAlgorithm` implements [`ClueAlgorithm`](../interfaces/clue-algorithm.md) via
 ``rank_clues(state: SpymasterView, *, limit=10) -> list[Clue]`` and sets ``name = "cluegen"`` for

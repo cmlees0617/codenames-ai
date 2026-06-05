@@ -17,7 +17,18 @@ uv sync --all-packages --group dev
 
 This installs workspace packages (`game-core`, `clue-eval`, `cluegen`, `cno-sdk`, `cno-bots`, `cno`) and dev tools (pytest, ruff, mypy, MkDocs).
 
+## Generate benchmark boards
+
+```bash
+uv sync --package clue-eval --extra embeddings
+uv run python packages/clue-eval/examples/generate_standard_board_set.py
+```
+
+Writes `packages/clue-eval/data/standard_boards_5000.json` (see [clue-eval](implementations/clue-eval.md)).
+
 ## Run predefined clue tests
+
+On `feature/spymaster-test-pipeline` only (catalog not on `main` yet):
 
 ```bash
 # Catalog smoke test (stub ClueAlgorithm, no ML)
@@ -85,7 +96,8 @@ Open [http://127.0.0.1:8000](http://127.0.0.1:8000). Production builds deploy to
 | Goal | Start here |
 |------|------------|
 | New clue strategy | [Add a clue algorithm](contributor-guides/adding-clue-algorithm.md) |
-| Spymaster benchmark / catalog | [clue-eval](implementations/clue-eval.md) (pipeline WIP) |
+| Benchmark board sets | [Add benchmark boards & catalog tests](contributor-guides/adding-clue-test.md) |
+| Spymaster test pipeline (WIP) | [clue-eval](implementations/clue-eval.md) |
 | New guess strategy | [Add a guess algorithm](contributor-guides/adding-guess-algorithm.md) |
 | New Codenames backend | [Add a game backend](contributor-guides/adding-game-backend.md) |
 | CLI flags or prompts | [Extend the CLI](contributor-guides/extending-cli.md) |

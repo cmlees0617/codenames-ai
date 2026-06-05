@@ -1,35 +1,38 @@
-# ADR-0004: Predefined clue-eval catalog; cluegen as optional example
+# ADR-0004: clue-eval boards, catalog, and spymaster test pipeline
 
-**Status:** Accepted (amended on `feature/spymaster-test-pipeline`)
+**Status:** Accepted (amended)
 
 ## Context
 
-Contributors should validate custom `ClueAlgorithm` implementations against a **shared, predefined test catalog** maintained in the repo—not against whichever embedding model ships in `cluegen`. The embedding spymaster is one possible implementation, useful for demos and as a reference for authors, but it must not be a required dependency of evaluation or of the core bot stack.
+Spymaster research needs **reproducible board sets** with known difficulty, not ad-hoc layouts per experiment. Contributors also need an **optional** embedding example (`cluegen`) that does not become a required dependency of board tooling or the live bot stack.
 
-On branch `feature/spymaster-test-pipeline`, `clue-eval` also carries an **in-progress spymaster test pipeline**: full-game simulation against fixed operative agents on the 5000-board benchmark set. That pipeline is **experimental**—APIs, game rules, operative kinds, and result formats are likely to be massively reworked before any stable release.
+**Merged to `main` (PR #13):** stratified board generation (`BoardFactory`), per-team GloVe difficulty, packaged embeddings, and `standard_boards_5000.json`.
+
+**On `feature/spymaster-test-pipeline` (not yet on `main`):** a predefined clue-test catalog (`SuiteRunner` / `ScenarioRunner`) and an **in-progress full-game spymaster test pipeline** (fixed operative agents, simulated games, result JSON). That pipeline is **experimental**—game rules, operative kinds, and output formats are likely to be massively reworked before merge.
 
 ## Decision
 
-1. **`clue-eval`** owns the predefined test catalog (`ClueTest`, `TestSuite`, `suite/catalog.py`) and runs any `ClueAlgorithm` through `SuiteRunner` / `ScenarioRunner`.
-2. **`cluegen`** remains an **optional example package** (embedding `ClueEngine`, `CluegenClueAlgorithm`, guess engines). It does not depend on `clue-eval` and is not invoked by the eval harness.
-3. **`cno-bots`** may default to `CluegenClueAlgorithm` for convenience, but `PlayerBuildOptions` accepts injected `clue_algorithm` / `guess_algorithm` so live play does not require the example package conceptually.
-4. New tests are added to `clue_eval.suite.catalog` (or JSON under `clue-eval/data/`) over time; comparing two contributor algorithms means running the **same suite** twice, not comparing to `cluegen`.
+1. **`clue-eval`** owns board generation and difficulty scoring (stable), plus—on the test-pipeline branch—the catalog and WIP simulation harness.
+2. **`cluegen`** remains an **optional example package**. It does not depend on `clue-eval`.
+3. **`cno-bots`** may default to `CluegenClueAlgorithm` for convenience, but `PlayerBuildOptions` accepts injected `clue_algorithm` / `guess_algorithm`.
+4. Contributors validate custom `ClueAlgorithm` implementations against the **shared catalog** and (optionally) the WIP full-game benchmark—not against `cluegen` as a required baseline.
 
 ## Consequences
 
 **Positive**
 
-- Clear product goal: pass the catalog, not beat the maintainer's model
-- Eval harness stays ML-free and fast in CI
-- Example code can evolve or be forked without breaking tests
+- Stable, ML-light board data (GloVe only for difficulty labels) ships independently of the experimental pipeline
+- Clear split between reproducible data (`clue-eval` boards), catalog tests, and example algorithms (`cluegen`)
+- Pipeline can evolve on its branch without blocking board PRs
 
 **Negative**
 
-- `cno-bots` still lists `cluegen` as a dependency for default CLI behavior (practical, not architectural)
+- `main` and `feature/spymaster-test-pipeline` temporarily describe different `clue-eval` scopes until the pipeline merges
 - Catalog is minimal until more cases are authored
+- Pipeline APIs are unstable; docs must carry WIP caveats
 
 **Follow-ups**
 
+- Merge and stabilize the spymaster test pipeline after design review
 - Expand `ClueTest` with assertions beyond `expected_targets` (legality, safety, etc.)
 - Optional JSON-driven catalog files per suite
-- Stabilize the spymaster test pipeline (operatives, game loop, scoring) after design review; expect breaking changes until then

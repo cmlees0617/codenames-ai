@@ -2,33 +2,35 @@
 
 **Path:** `packages/clue-eval`
 
-!!! warning "Work in progress"
-    The **spymaster test pipeline** on branch `feature/spymaster-test-pipeline` is experimental and incomplete. Catalog cases, operative agents, simulated game rules, CLI flags, and result JSON formats are likely to change substantially—or be replaced entirely. Treat the examples below as provisional; avoid building long-lived integrations against them until the pipeline stabilizes.
-
 ## Purpose
 
-**Predefined clue tests** and a **model-agnostic harness** for running any [`ClueAlgorithm`](../interfaces/clue-algorithm.md) through them, plus an in-progress **full-game spymaster benchmark** (5000 boards × operative conditions).
+**Board generation and GloVe difficulty scoring** (stable on `main`), plus—on branch `feature/spymaster-test-pipeline`—a **predefined clue-test catalog**, operative test conditions, and an in-progress **full-game spymaster benchmark**.
 
 Contributors implement `ClueAlgorithm`, then run the repo catalog—they are **not** scored against another algorithm in the monorepo (including `cluegen`).
 
-Depends on **`game-core` only** (optional extras for GloVe, LLM, and sentence-transformer operatives).
+Depends on **`game-core`**; optional extras add GloVe embeddings, LLM operatives, and sentence-transformer operatives.
+
+!!! warning "Test pipeline in progress"
+    Only the **full-game spymaster benchmark** (simulation loop, operative agents, CLI, result JSON) is experimental and likely to be massively reworked. Board generation and the catalog API are comparatively stable.
 
 ## Layout
 
 ```text
 packages/clue-eval/
-  data/                    # test_boards.json, words.txt, glove-wiki-gigaword-300.npz
+  data/                    # words.txt, glove-wiki-gigaword-300.npz, standard_boards_5000.json, …
+  examples/
+    generate_standard_board_set.py
+    run_spymaster_simulation.py   # WIP test-pipeline CLI
   src/clue_eval/
-    boards/                # layouts, factory, SpymasterView conversion
+    boards/                # layouts, factory, difficulty, I/O, SpymasterView conversion
+    embeddings/            # GloVe store and generation CLI
     scenarios/             # Scenario + ScenarioRunner
     suite/                 # ClueTest, TestSuite, catalog, SuiteRunner
     benchmark/             # timing / summary printing
     simulation/            # full-game benchmark runner (WIP)
-    operatives/            # standard operative test conditions (WIP)
+    operatives/            # operative test conditions (WIP)
     clues/                 # spymaster clue legality (stem, homophone, …)
     demos/                 # StubClueAlgorithm for CI smoke
-  examples/
-    run_spymaster_simulation.py   # CLI for the WIP benchmark pipeline
   tests/
 ```
 
@@ -201,11 +203,24 @@ Saved JSON is ordered **easiest → hardest** (``id`` 1 = easiest).
 From the repository root:
 
 ```bash
+uv sync --package clue-eval --extra embeddings
 uv run python packages/clue-eval/examples/generate_standard_board_set.py
 ```
 
 Writes ``packages/clue-eval/data/standard_boards_5000.json`` (``beta=2.0``, ``seed=42`` by default).
 Load with ``load_boards_from_json`` and split into train/test in application code.
+
+### Use boards in algorithm tests
+
+Convert a fixture layout into a ``SpymasterView`` for unit tests:
+
+```python
+from clue_eval.boards import board_layout_to_spymaster_view, load_boards_from_json
+from clue_eval.paths import default_standard_boards_path
+
+boards = load_boards_from_json(default_standard_boards_path())
+view = board_layout_to_spymaster_view(boards[0], team="blue")
+```
 
 ## Word embeddings (GloVe)
 

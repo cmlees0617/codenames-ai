@@ -7,8 +7,15 @@ Python monorepo for [Codenames Online](https://codenames.game) bots: wire client
 ```bash
 uv sync --all-packages --group dev
 uv run cno                          # join a live room
-uv run python -m clue_eval --stub    # predefined clue test catalog (smoke)
-uv run python -m cluegen             # optional embedding example (not the catalog)
+uv run python -m cluegen             # optional embedding example
+uv run python packages/clue-eval/examples/generate_standard_board_set.py  # benchmark boards
 ```
 
-**Spymaster test pipeline** (branch `feature/spymaster-test-pipeline`): full-game benchmarks via `packages/clue-eval/examples/run_spymaster_simulation.py`. This harness is **work in progress** and likely to be massively reworked—see [clue-eval docs](docs/implementations/clue-eval.md).
+On branch `feature/spymaster-test-pipeline` only:
+
+```bash
+uv run python -m clue_eval --stub    # catalog smoke test
+uv run python packages/clue-eval/examples/run_spymaster_simulation.py --cluegen --sample 10
+```
+
+The spymaster test pipeline is **work in progress** and likely to be massively reworked—see [clue-eval docs](docs/implementations/clue-eval.md).

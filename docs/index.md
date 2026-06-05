@@ -4,10 +4,10 @@ This site documents the **codenames-ai** Python monorepo for **contributors and 
 
 ## What this repository does
 
-The project connects AI bots to [Codenames Online](https://codenames.game): spymasters rank clues from board state, operatives guess words, and a thin CLI starts bots in live rooms. Offline embedding search lives in **cluegen**. **clue-eval** provides a predefined clue-test catalog and an in-progress **spymaster test pipeline** (full-game benchmarks on stratified boards).
+The project connects AI bots to [Codenames Online](https://codenames.game): spymasters rank clues from board state, operatives guess words, and a thin CLI starts bots in live rooms. Offline embedding search lives in **cluegen**. **clue-eval** provides stratified benchmark boards and GloVe difficulty scoring (on `main`); branch `feature/spymaster-test-pipeline` additionally adds a clue-test catalog and an in-progress **spymaster test pipeline**.
 
 !!! warning "Test pipeline in progress"
-    On branch `feature/spymaster-test-pipeline`, the benchmark harness (operatives, simulated games, result files) is **experimental** and likely to be massively reworked. See [clue-eval](implementations/clue-eval.md) for current behavior and caveats.
+    The full-game benchmark harness (operatives, simulated games, result files) exists only on `feature/spymaster-test-pipeline` and is **experimental**—likely to be massively reworked before merge. Board generation is stable. See [clue-eval](implementations/clue-eval.md).
 
 ## How to read this site
 
@@ -51,7 +51,7 @@ This site is for **contributors and maintainers**, not external end users.
 apps/cno/              CLI entrypoint (argparse, questionary)
 packages/cno-bots/     CNO player bots + orchestration
 packages/cno-sdk/      codenames.game wire client
-packages/clue-eval/    Clue-test catalog + WIP spymaster test pipeline
+packages/clue-eval/    Benchmark boards (+ catalog & WIP test pipeline on feature branch)
 packages/cluegen/      Optional example embedding algorithms
 packages/game-core/    Domain types and protocols
 ```

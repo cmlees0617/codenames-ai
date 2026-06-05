@@ -5,7 +5,7 @@
 | Package | Path | Responsibility |
 |---------|------|----------------|
 | `game-core` | `packages/game-core` | Domain types, role views, `Protocol`s |
-| `clue-eval` | `packages/clue-eval` | Clue-test catalog + WIP spymaster test pipeline |
+| `clue-eval` | `packages/clue-eval` | Benchmark boards (+ catalog & WIP test pipeline on feature branch) |
 | `cluegen` | `packages/cluegen` | Optional example embedding algorithms (not required by eval) |
 | `cno-sdk` | `packages/cno-sdk` | codenames.game Socket.IO client, `GameState` parsing |
 | `cno-bots` | `packages/cno-bots` | View adapter, `CNOSpymasterBot`, `CNOOperativeBot`, `run_full_game` |
@@ -25,12 +25,12 @@ Root `pyproject.toml` defines the uv workspace (`apps/*`, `packages/*`) and shar
 
 ### clue-eval
 
-**Solves:** Evaluate any `ClueAlgorithm` on synthetic or fixture boards without live play, plus an in-progress full-game spymaster benchmark (branch `feature/spymaster-test-pipeline`).
+**Solves:** Produce reproducible board sets with per-team difficulty (stable on `main`). On `feature/spymaster-test-pipeline`, also evaluate `ClueAlgorithm` implementations via a catalog and an in-progress full-game spymaster benchmark.
 
 !!! warning "Pipeline in progress"
-    Simulation rules, operative agents, and benchmark outputs are unstable and likely to be massively reworked.
+    Only the simulation harness (operative agents, game loop, result JSON) is unstable and likely to be massively reworked. Board generation is stable.
 
-**Contains:** `BoardFactory`, `SuiteRunner` / `ScenarioRunner`, clue legality checks, operative test conditions, `simulation` runners, `run_spymaster_simulation.py`, `board_layout_to_spymaster_view`.
+**Contains:** `BoardFactory`, `board_difficulty`, `EmbeddingStore`, `generate_standard_board_set.py`, `board_layout_to_spymaster_view`; on the feature branch—`SuiteRunner` / `ScenarioRunner`, clue legality, operative test conditions, `simulation` runners, `run_spymaster_simulation.py`.
 
 **May import:** `game-core`, `numpy`, `tqdm`, optional `gensim` / `transformers` / `sentence-transformers`. **Must not import:** `cluegen`, `cno-sdk`, `cno-bots`, `apps/cno`.
 

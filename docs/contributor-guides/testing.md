@@ -10,7 +10,7 @@ uv run pytest -m "not integration"
 |---------|------|-------|
 | `game-core` | `packages/game-core/tests` | Types, protocols |
 | `cluegen` | `packages/cluegen/tests` | Engines + algorithms (mocked ML) |
-| `clue-eval` | `packages/clue-eval/tests` | Boards, scenarios, catalog, simulation (WIP pipeline) |
+| `clue-eval` | `packages/clue-eval/tests` | Board factory, difficulty, scenarios, catalog, simulation (WIP) |
 | `cno-sdk` | `packages/cno-sdk/tests` | Protocol parsing, fixtures |
 | `cno-bots` | `packages/cno-bots/tests` | View mapping, protocols |
 | `cno` | `apps/cno/tests` | Argparse, interactive wiring |
