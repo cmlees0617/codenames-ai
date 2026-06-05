@@ -1,4 +1,6 @@
+from cluegen.algorithms import CluegenClueAlgorithm
 from cluegen.algorithms.scripted import ScriptedClueAlgorithm, ScriptedGuessAlgorithm
+from game_core.algorithms import ClueAlgorithm, IdentifiableClueAlgorithm
 from game_core.types import GuessAction
 from game_core.views import (
     BoardTileView,
@@ -7,6 +9,13 @@ from game_core.views import (
     SpymasterBoardCard,
     SpymasterView,
 )
+
+
+def test_cluegen_clue_algorithm_satisfies_game_core_protocol():
+    algo = CluegenClueAlgorithm()
+    assert isinstance(algo, ClueAlgorithm)
+    assert isinstance(algo, IdentifiableClueAlgorithm)
+    assert algo.name == "cluegen"
 
 
 def test_scripted_clue_algorithm():

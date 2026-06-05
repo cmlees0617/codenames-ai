@@ -18,7 +18,7 @@ def collect_operative_guesses(
     clue: Clue,
     guess_algorithm: GuessAlgorithm,
 ) -> list[str]:
-    """Ask the operative for up to ``clue.count`` guesses (one per protocol call)."""
+    """Ask the operative for up to ``clue.count`` word guesses (one per protocol call)."""
     state = board_layout_to_operative_view(
         board,
         team=team,
@@ -32,7 +32,7 @@ def collect_operative_guesses(
             break
         action = guess_algorithm.guess_word(state)
         if action.pass_turn or action.word is None:
-            break
+            raise ValueError("Operative cannot pass during a clue turn.")
         guesses.append(action.word)
         state = apply_guess(state, action.word)
     return guesses

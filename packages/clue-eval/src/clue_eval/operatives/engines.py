@@ -8,24 +8,15 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+from clue_eval.embeddings.glove import GloVeEncoder, get_glove_encoder
+from clue_eval.embeddings.sentence_transformer import (
+    SentenceTransformerEncoder,
+    get_sentence_transformer_encoder,
+)
 from clue_eval.embeddings.store import EmbeddingStore
 
 DEFAULT_SOFTMAX_TEMPERATURE = 0.35
 DEFAULT_SOFTMAX_CANDIDATE_MULTIPLIER = 3
-
-
-def encode_phrase(embeddings: EmbeddingStore, text: str) -> np.ndarray:
-    """Mean GloVe vector for uppercase tokens found in the packaged word list."""
-    tokens = [token for token in re.split(r"[\s\-]+", text.strip().upper()) if token]
-    vectors = []
-    for token in tokens:
-        try:
-            vectors.append(embeddings.vector_for(token))
-        except KeyError:
-            continue
-    if not vectors:
-        raise KeyError(f"No packaged embedding for clue phrase {text!r}")
-    return np.mean(vectors, axis=0).astype(np.float32)
 
 
 def _cosine_scores(clue_vector: np.ndarray, word_vectors: np.ndarray) -> np.ndarray:
@@ -51,20 +42,73 @@ class OperativeGuessEngine(ABC):
 
 
 class StaticEmbeddingGuessEngine(OperativeGuessEngine):
-    """Top-``count`` board words by cosine similarity to the clue in GloVe space."""
+    """
+    Top-``count`` board words by cosine similarity to the clue in GloVe space.
 
-    def __init__(self, embeddings: EmbeddingStore) -> None:
+    Clue phrases are embedded with the full GloVe model; unrevealed board words use
+    the packaged Codenames ``words.txt`` vectors.
+    """
+
+    def __init__(
+        self,
+        embeddings: EmbeddingStore,
+        *,
+        clue_encoder: GloVeEncoder | None = None,
+    ) -> None:
         super().__init__()
         self._embeddings = embeddings
+        self.clue_encoder = clue_encoder or get_glove_encoder()
 
     def guess(self, clue: str, count: int) -> list[str]:
         if not self.visible_words or count < 1:
             return []
 
         count = min(count, len(self.visible_words))
-        clue_vector = encode_phrase(self._embeddings, clue)
+        clue_vector = self.clue_encoder.encode_phrase(clue)
         word_vectors = np.stack(
             [self._embeddings.vector_for(word) for word in self.visible_words],
+            axis=0,
+        )
+        scores = _cosine_scores(clue_vector, word_vectors)
+        top_indices = scores.argsort()[-count:][::-1]
+        return [self.visible_words[index] for index in top_indices]
+
+
+class StaticCluegenEmbeddingGuessEngine(OperativeGuessEngine):
+    """
+    Top-``count`` board words by cosine similarity in cluegen's embedding space.
+
+    Clue and board words both use ``all-MiniLM-L6-v2`` (same as
+    :class:`cluegen.clue_engine.ClueEngine`). Sanity-check pairing for
+    :class:`cluegen.algorithms.CluegenClueAlgorithm`.
+    """
+
+    def __init__(
+        self,
+        *,
+        encoder: SentenceTransformerEncoder | None = None,
+    ) -> None:
+        super().__init__()
+        self.encoder = encoder or get_sentence_transformer_encoder()
+        self._word_cache: dict[str, np.ndarray] = {}
+
+    def _word_vector(self, word: str) -> np.ndarray:
+        key = word.upper()
+        cached = self._word_cache.get(key)
+        if cached is not None:
+            return cached
+        vector = self.encoder.encode_word(key)
+        self._word_cache[key] = vector
+        return vector
+
+    def guess(self, clue: str, count: int) -> list[str]:
+        if not self.visible_words or count < 1:
+            return []
+
+        count = min(count, len(self.visible_words))
+        clue_vector = self.encoder.encode_phrase(clue)
+        word_vectors = np.stack(
+            [self._word_vector(word) for word in self.visible_words],
             axis=0,
         )
         scores = _cosine_scores(clue_vector, word_vectors)
@@ -76,19 +120,21 @@ class SoftmaxEmbeddingGuessEngine(OperativeGuessEngine):
     """
     Sample ``count`` words from a softmax over the top similarity candidates.
 
-    Simulates operative uncertainty while staying embedding-grounded.
+    Clue encoding uses the full GloVe model; board words use the packaged store.
     """
 
     def __init__(
         self,
         embeddings: EmbeddingStore,
         *,
+        clue_encoder: GloVeEncoder | None = None,
         temperature: float = DEFAULT_SOFTMAX_TEMPERATURE,
         candidate_multiplier: int = DEFAULT_SOFTMAX_CANDIDATE_MULTIPLIER,
         seed: int | None = None,
     ) -> None:
         super().__init__()
         self._embeddings = embeddings
+        self.clue_encoder = clue_encoder or get_glove_encoder()
         self._temperature = temperature
         self._candidate_multiplier = candidate_multiplier
         self._rng = np.random.default_rng(seed)
@@ -98,7 +144,7 @@ class SoftmaxEmbeddingGuessEngine(OperativeGuessEngine):
             return []
 
         count = min(count, len(self.visible_words))
-        clue_vector = encode_phrase(self._embeddings, clue)
+        clue_vector = self.clue_encoder.encode_phrase(clue)
         word_vectors = np.stack(
             [self._embeddings.vector_for(word) for word in self.visible_words],
             axis=0,

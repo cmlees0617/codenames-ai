@@ -364,6 +364,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+cluegen = [
+    { name = "sentence-transformers" },
+]
 embeddings = [
     { name = "gensim" },
 ]
@@ -380,10 +383,11 @@ requires-dist = [
     { name = "metaphone", specifier = ">=0.6" },
     { name = "nltk", specifier = ">=3.8" },
     { name = "numpy" },
+    { name = "sentence-transformers", marker = "extra == 'cluegen'", specifier = ">=3.0" },
     { name = "tqdm" },
     { name = "transformers", marker = "extra == 'llm'", specifier = ">=4.40" },
 ]
-provides-extras = ["embeddings", "llm"]
+provides-extras = ["embeddings", "cluegen", "llm"]
 
 [[package]]
 name = "cluegen"

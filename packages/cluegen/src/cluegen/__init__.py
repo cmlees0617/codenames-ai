@@ -1,11 +1,5 @@
-"""Offline Codenames clue and guess engines."""
+"""Offline Codenames clue and guess engines.
 
-from cluegen.clue_engine import ClueEngine
-from cluegen.guess_engine import EmbeddingGuessEngine, GuessEngine, LLMGuessEngine
-
-__all__ = [
-    "ClueEngine",
-    "EmbeddingGuessEngine",
-    "GuessEngine",
-    "LLMGuessEngine",
-]
+Import from submodules (for example ``cluegen.algorithms``) to avoid loading
+heavy ML dependencies at package import time.
+"""

@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 
+from clue_eval.embeddings.glove import load_gensim_model, lookup_vector
 from clue_eval.embeddings.store import (
     MODEL_NAME,
     VECTOR_SIZE,
@@ -17,28 +18,6 @@ from clue_eval.embeddings.store import (
 from clue_eval.paths import package_data_dir
 
 
-def _load_gensim_model():
-    import gensim.downloader as api
-
-    return api.load(MODEL_NAME)
-
-
-def _lookup_vector(model, word: str) -> np.ndarray | None:
-    """Resolve a GloVe vector; multi-word phrases use the mean of known tokens."""
-    key = word.lower()
-    if key in model:
-        return np.asarray(model[key], dtype=np.float32)
-
-    tokens = key.split()
-    if len(tokens) < 2:
-        return None
-
-    token_vectors = [np.asarray(model[token], dtype=np.float32) for token in tokens if token in model]
-    if not token_vectors:
-        return None
-    return np.mean(token_vectors, axis=0).astype(np.float32)
-
-
 def build_store(
     words: list[str],
     *,
@@ -46,7 +25,7 @@ def build_store(
 ) -> EmbeddingStore:
     """Look up GloVe vectors for each word (lowercase key in the model)."""
     if model is None:
-        model = _load_gensim_model()
+        model = load_gensim_model()
 
     if getattr(model, "vector_size", None) not in (None, VECTOR_SIZE):
         raise ValueError(

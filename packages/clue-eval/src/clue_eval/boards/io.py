@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from clue_eval.boards.types import FixtureBoard
+from clue_eval.paths import default_standard_boards_path
 
 
 def mean_board_difficulty(board: FixtureBoard) -> float:
@@ -40,6 +41,28 @@ def save_boards_to_json(
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return path
+
+
+def load_standard_boards(
+    path: Path | None = None,
+    *,
+    limit: int | None = None,
+) -> list[FixtureBoard]:
+    """
+    Load boards from the standard 5000-board benchmark file (or ``path``).
+
+    When ``limit`` is set, return only the first ``limit`` boards in file order.
+    """
+    if limit is not None and limit < 1:
+        raise ValueError(f"limit must be >= 1, got {limit}")
+
+    boards_path = path or default_standard_boards_path()
+    boards = load_boards_from_json(boards_path)
+    if not boards:
+        raise FileNotFoundError(f"No boards found at {boards_path}")
+    if limit is not None:
+        return boards[:limit]
+    return boards
 
 
 def load_boards_from_json(path: Path) -> list[FixtureBoard]:

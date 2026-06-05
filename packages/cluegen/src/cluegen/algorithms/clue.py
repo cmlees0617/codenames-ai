@@ -6,12 +6,13 @@ import contextlib
 import io
 import logging
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from game_core.types import Clue
 from game_core.views import SpymasterView
 
-from cluegen.clue_engine import ClueEngine
+if TYPE_CHECKING:
+    from cluegen.clue_engine import ClueEngine
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,15 @@ def _result_to_clue(result: dict[str, Any]) -> Clue:
 
 
 class CluegenClueAlgorithm:
-    """Rank clues using semantic embeddings (cluegen ``ClueEngine``)."""
+    """
+    Rank clues using semantic embeddings (cluegen ``ClueEngine``).
+
+    Implements :class:`~game_core.algorithms.ClueAlgorithm` and exposes
+    :attr:`name` for :class:`~game_core.algorithms.IdentifiableClueAlgorithm`
+    benchmark output files.
+    """
+
+    name = "cluegen"
 
     def __init__(
         self,
@@ -81,6 +90,8 @@ class CluegenClueAlgorithm:
         return self._engine
 
     def _ensure_loaded(self) -> ClueEngine:
+        from cluegen.clue_engine import ClueEngine
+
         if self._engine is None:
             logger.info("Loading clue vocabulary from %s...", self._vocab_path)
             engine = ClueEngine()
@@ -116,6 +127,7 @@ class CluegenClueAlgorithm:
                 assassins=assassins,
             )
             if self._prune_vocabulary:
+                engine.reset_vocabulary()
                 engine.prune_vocabulary()
             results = engine.generate_ranked_clues(
                 min_targets=1,

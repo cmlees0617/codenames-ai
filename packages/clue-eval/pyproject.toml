@@ -15,6 +15,9 @@ dependencies = [
 embeddings = [
     "gensim>=4.3.2",
 ]
+cluegen = [
+    "sentence-transformers>=3.0",
+]
 llm = [
     "transformers>=4.40",
     "accelerate>=1.0",

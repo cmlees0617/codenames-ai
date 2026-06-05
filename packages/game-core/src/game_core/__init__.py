@@ -1,6 +1,6 @@
 """Game-agnostic Codenames types and protocols."""
 
-from game_core.algorithms import ClueAlgorithm, GuessAlgorithm
+from game_core.algorithms import ClueAlgorithm, GuessAlgorithm, IdentifiableClueAlgorithm
 from game_core.backends import GameBackend
 from game_core.players import OperativePlayer, SpymasterPlayer
 from game_core.types import Clue, GuessAction, Role, TeamColor, TileColor
@@ -13,6 +13,7 @@ __all__ = [
     "GameBackend",
     "GuessAction",
     "GuessAlgorithm",
+    "IdentifiableClueAlgorithm",
     "OperativePlayer",
     "OperativeView",
     "Role",

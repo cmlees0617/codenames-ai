@@ -18,7 +18,7 @@ def test_scenario_runner_returns_clue():
     result = ScenarioRunner(StubClueAlgorithm()).run(scenario)
 
     assert result["name"] == "smoke"
-    assert result["generated_clue"] == "TEST"
+    assert result["generated_clue"] == "LINK"
     assert result["targets_covered"] == ["ALPHA", "BRAVO"]
     assert result["pass"] is None
 

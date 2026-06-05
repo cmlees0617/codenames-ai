@@ -1,6 +1,7 @@
 """Predefined clue tests and model-agnostic evaluation harness."""
 
 from clue_eval.benchmark.runner import BenchmarkRunner
+from clue_eval.simulation import SpymasterSimulationRunner, run_spymaster_benchmark_all_operatives
 from clue_eval.boards.factory import BoardFactory
 from clue_eval.boards.io import load_boards_from_json
 from clue_eval.boards.types import BoardLayout
@@ -30,6 +31,8 @@ __all__ = [
     "ClueTest",
     "Scenario",
     "ScenarioRunner",
+    "SpymasterSimulationRunner",
+    "run_spymaster_benchmark_all_operatives",
     "create_operative_algorithm",
     "is_legal_clue",
     "validate_clue_legality",

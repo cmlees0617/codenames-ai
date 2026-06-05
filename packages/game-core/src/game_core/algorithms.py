@@ -29,6 +29,19 @@ class ClueAlgorithm(Protocol):
 
 
 @runtime_checkable
+class IdentifiableClueAlgorithm(ClueAlgorithm, Protocol):
+    """
+    :class:`ClueAlgorithm` with a stable ``name`` for benchmark output files.
+
+    Implementations should set ``name`` to a filesystem-safe model identifier
+    (for example ``"my-spymaster-v2"``).
+    """
+
+    @property
+    def name(self) -> str: ...
+
+
+@runtime_checkable
 class GuessAlgorithm(Protocol):
     """Choose one operative guess or end the guessing phase."""
 

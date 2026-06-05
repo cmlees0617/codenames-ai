@@ -51,9 +51,10 @@ Evaluate a spymaster clue against a fixed operative agent (same GloVe space as b
 
 | Kind | Class | Behavior |
 |------|--------|----------|
-| `static_embedding` | `StaticEmbeddingGuessAlgorithm` | Top-K board words by cosine to clue |
-| `softmax_embedding` | `SoftmaxEmbeddingGuessAlgorithm` | Sample K words from softmax over top candidates |
+| `static_embedding` | `StaticEmbeddingGuessAlgorithm` | Embed clue in full GloVe; top-K board words by cosine |
+| `softmax_embedding` | `SoftmaxEmbeddingGuessAlgorithm` | Embed clue in full GloVe; sample K board words from softmax |
 | `llm` | `LlmGuessAlgorithm` | Local instruct LLM; JSON schema `{"words": [...]}` |
+| `cluegen_embedding` | `StaticCluegenEmbeddingGuessAlgorithm` | ``all-MiniLM-L6-v2`` for clue + board (cluegen sanity check; optional) |
 
 ```python
 from clue_eval import ScenarioRunner
@@ -78,6 +79,60 @@ Install `llm` optional deps for the LLM operative: `uv sync --package clue-eval 
 4. Count ≥ 1.
 
 `ScenarioRunner` adds a `clue_legality` block for the top-ranked clue.
+
+### Full-game spymaster simulation (5000 boards)
+
+The default benchmark runs **all three** operative test conditions: 3 × 5000 = **15,000**
+games per spymaster, with one JSON file per operative:
+
+``data/results/{spymaster_name}_{operative_kind}.json``
+
+(e.g. ``my-model_static_embedding.json``, ``my-model_softmax_embedding.json``,
+``my-model_llm.json``). Each file records both ``spymaster_name`` and ``operative_kind``.
+
+Use :func:`~clue_eval.simulation.run_spymaster_benchmark_all_operatives` or the CLI example
+below. For a single operative, use :class:`~clue_eval.simulation.SpymasterSimulationRunner`
+with one ``operative_kind``.
+
+Game loop (test spymaster on whichever team has **more** words on that board, plus
+the matching operative):
+
+1. Spymaster ranks clues; illegal clue (including empty / no clue) → **abort** (only use of abort).
+2. Operative makes at most ``count`` guesses (no ``count + 1`` bonus). Wrong guess or
+   pass ends the turn. Assassin → **loss**; all team words → **win**.
+3. Opponent reveals one unrevealed word on their team (perfect guess, one per round).
+4. **Loss** if the assassin is hit or all opponent words are revealed (8 opponent turns on a
+   standard 8-red layout when reds are only removed in step 3).
+5. Each game in the results JSON includes ``difficulty_*`` fields when boards carry
+   ``difficulty`` metadata for correlation with win/loss/abort.
+
+Expose ``name`` on your spymaster (see :class:`~game_core.algorithms.IdentifiableClueAlgorithm`)
+for result filenames, or the class name is used.
+
+```python
+from clue_eval.simulation import run_spymaster_benchmark_all_operatives
+
+run_spymaster_benchmark_all_operatives(MySpymaster())
+```
+
+CLI (all three operatives by default):
+
+``uv run python packages/clue-eval/examples/run_spymaster_simulation.py --spymaster-module mypkg:MySpymaster``
+
+Example [`cluegen`](cluegen.md) spymaster: ``--cluegen`` (same as
+``--spymaster-module cluegen.algorithms.clue:CluegenClueAlgorithm``). Progress: one
+tqdm bar per operative condition (5000 games each) plus an outer bar over the three conditions.
+
+Debug run (first 50 boards, one operative, separate results file)::
+
+``uv run python packages/clue-eval/examples/run_spymaster_simulation.py --cluegen --operative static_embedding --sample 50``
+
+Writes ``cluegen_static_embedding_sample50.json`` (sample runs never overwrite full-benchmark files).
+
+Flags:
+
+- ``--operative KIND`` — ``static_embedding``, ``softmax_embedding``, or ``llm`` (default: all three)
+- ``-n`` / ``--sample`` / ``--limit`` — first N boards only
 
 Smoke run (stub algorithm, no ML):
 
@@ -145,7 +200,9 @@ Load with ``load_boards_from_json`` and split into train/test in application cod
 
 ## Word embeddings (GloVe)
 
-The Codenames word list (`data/words.txt`, 400 words) has precomputed **glove-wiki-gigaword-300** vectors in `data/glove-wiki-gigaword-300.npz` (300 dimensions). GloVe is a strong static baseline for word similarity; it is not contextual like sentence-transformers.
+The Codenames word list (`data/words.txt`, 400 words) has precomputed **glove-wiki-gigaword-300** vectors in `data/glove-wiki-gigaword-300.npz` (300 dimensions). Board difficulty scoring and embedding operatives compare against this packaged matrix.
+
+**Clue encoding** for static/softmax operatives uses the **full** `glove-wiki-gigaword-300` model (lazy-loaded via gensim on first use), so arbitrary English clue words like `MARGINS` are embedded and compared to the 400 board-word vectors. GloVe is a strong static baseline for word similarity; it is not contextual like sentence-transformers.
 
 Regenerate after changing `words.txt`:
 

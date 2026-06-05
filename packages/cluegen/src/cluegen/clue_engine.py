@@ -75,6 +75,7 @@ class ClueEngine:
             with open(cache_path, 'rb') as f:
                 self.vocabulary = pickle.load(f)
             print(f"Loaded {len(self.vocabulary)} words from cache.")
+            self._snapshot_vocabulary()
             return
 
         # Compute embeddings if no cache exists
@@ -92,6 +93,17 @@ class ClueEngine:
             print(f"Saving embeddings to {cache_path}...")
         with open(cache_path, 'wb') as f:
             pickle.dump(self.vocabulary, f)
+        self._snapshot_vocabulary()
+
+    def _snapshot_vocabulary(self) -> None:
+        """Keep a restorable copy; :meth:`prune_vocabulary` mutates ``self.vocabulary`` in place."""
+        self._vocabulary_master = dict(self.vocabulary)
+
+    def reset_vocabulary(self) -> None:
+        """Restore the full clue vocabulary after pruning (call once per spymaster turn)."""
+        master = getattr(self, "_vocabulary_master", None)
+        if master:
+            self.vocabulary = dict(master)
 
     def prune_vocabulary(self, danger_threshold: float = 0.25, relevance_threshold: float = 0.1):
         """

@@ -7,7 +7,9 @@ from game_core.views import SpymasterView
 
 
 class StubClueAlgorithm:
-    """Return a deterministic TEST clue from the first friendly targets on the board."""
+    """Return a deterministic clue from the first friendly targets on the board."""
+
+    name = "stub-spymaster"
 
     def rank_clues(self, state: SpymasterView, *, limit: int = 10) -> list[Clue]:
         targets = tuple(
@@ -17,5 +19,5 @@ class StubClueAlgorithm:
         )[:3]
         if not targets:
             return []
-        clue = Clue(word="TEST", count=len(targets), intended_targets=targets)
+        clue = Clue(word="LINK", count=min(len(targets), 2), intended_targets=targets)
         return [clue][:limit]
